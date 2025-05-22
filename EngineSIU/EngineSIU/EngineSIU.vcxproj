@@ -190,7 +190,7 @@ xcopy /y /d "$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\FBX\lib\x64\$
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\DirectXTK\Lib\$(PlatformTarget)\$(Configuration);$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\Lua\lib\$(Configuration);$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\Lua\bin\$(Configuration);$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\fmod\lib\$(PlatformTarget);$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\FBX\lib\x64\$(Configuration);$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\physx\bin\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>DirectXTK.lib;lua.lib;fmod_vc.lib;fmodL_vc.lib;alembic.lib;libfbxsdk.lib;libxml2.lib;zlib.lib;LowLevel_static_64.lib;LowLevelAABB_static_64.lib;LowLevelDynamics_static_64.lib;PhysX_64.lib;PhysXCharacterKinematic_static_64.lib;PhysXCommon_64.lib;PhysXCooking_64.lib;PhysXExtensions_static_64.lib;PhysXFoundation_64.lib;PhysXPvdSDK_static_64.lib;PhysXTask_static_64.lib;PhysXVehicle_static_64.lib;SceneQuery_static_64.lib;SimulationController_static_64.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>DirectXTK.lib;lua.lib;fmod_vc.lib;fmodL_vc.lib;alembic.lib;libfbxsdk.lib;libxml2.lib;zlib.lib;PhysX_64.lib;PhysXFoundation_64.lib;PhysXExtensions_static_64.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <FxCompile>
       <ShaderModel>5.0</ShaderModel>
