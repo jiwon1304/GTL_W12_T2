@@ -21,6 +21,14 @@ void InitPhysX() {
     sceneDesc.cpuDispatcher = gDispatcher;
     sceneDesc.filterShader = PxDefaultSimulationFilterShader;
     gScene = gPhysics->createScene(sceneDesc);
+
+    GameObject obj = CreateBox({0, 0, 0}, {1, 1, 1});
+    Simulate(1 / 60.f);
+
+    for (GameObject& g_object : gObjects)
+    {
+        int a = 0;
+    } 
 }
 
 GameObject CreateBox(const PxVec3& pos, const PxVec3& halfExtents) {

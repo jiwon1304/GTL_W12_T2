@@ -697,7 +697,7 @@ void PropertyEditorPanel::RenderForSkeletalMesh(USkeletalMeshComponent* Skeletal
 
         // End Animation
 
-        if (ImGui::Button("Open Viewer"))
+        if (ImGui::Button("Open Skeleton & Animation Viewer"))
         {
             UEditorEngine* Engine = Cast<UEditorEngine>(GEngine);
             if (!Engine)
@@ -708,6 +708,19 @@ void PropertyEditorPanel::RenderForSkeletalMesh(USkeletalMeshComponent* Skeletal
             {
                 Engine->StartSkeletalMeshViewer(FName(SkeletalMeshComp->GetSkeletalMeshAsset()->GetRenderData()->ObjectName), SkeletalMeshComp->GetAnimation());
             }
+        }
+
+        if (ImGui::Button("Open Physics Viewer"))
+        {
+            UEditorEngine* Engine = Cast<UEditorEngine>(GEngine);
+            if (!Engine)
+            {
+                return;
+            }
+            // if (SkeletalMeshComp->GetSkeletalMeshAsset() && SkeletalMeshComp->GetSkeletalMeshAsset()->GetPhysicsAsset())
+            // {
+            //     Engine->StartPhyscisAssetEditor(FName(SkeletalMeshComp->GetSkeletalMeshAsset()->GetRenderData()->ObjectName), SkeletalMeshComp->GetAnimation());
+            // }
         }
         ImGui::TreePop();
     }
