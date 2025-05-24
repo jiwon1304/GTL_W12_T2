@@ -5,6 +5,7 @@
 #include "Engine/Asset/SkeletalMeshAsset.h"
 #include "Template/SubclassOf.h"
 #include "Animation/AnimNodeBase.h"
+#include "Engine/Source/Runtime/Core/Container/Array.h"
 
 class UAnimSequence;
 class USkeletalMesh;
@@ -134,6 +135,12 @@ private:
     static bool bIsCPUSkinning;
 
     void CPUSkinning(bool bForceUpdate = false);
+
+    /** Array of FBodyInstance objects, storing per-instance state about about each body. */
+    TArray<struct FBodyInstance*> Bodies;
+
+    /** Array of FConstraintInstance structs, storing per-instance state about each constraint. */
+    TArray<struct FConstraintInstance*> Constraints;
 
 public:
     TSubclassOf<UAnimInstance> AnimClass;

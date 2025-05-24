@@ -1,6 +1,7 @@
 
 #include "Asset/SkeletalMeshAsset.h"
 #include "SkeletalMesh.h"
+#include "Engine/Source/Runtime/Physics/PhysicAsset/PhysicsAsset.h"
 
 void USkeletalMesh::SetRenderData(std::unique_ptr<FSkeletalMeshRenderData> InRenderData)
 {

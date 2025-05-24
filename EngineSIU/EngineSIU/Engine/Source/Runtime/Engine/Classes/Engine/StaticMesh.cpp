@@ -4,6 +4,7 @@
 #include "UObject/ObjectFactory.h"
 
 #include "Engine/Asset/StaticMeshAsset.h"
+#include "Engine/Source/Runtime/Physics/PhysicAsset/BodySetup.h"
 
 UObject* UStaticMesh::Duplicate(UObject* InOuter)
 {

@@ -2,6 +2,7 @@
 #include "SkinnedAsset.h"
 #include "Asset/SkeletalMeshAsset.h" 
 class USkeleton;
+class UPhysicsAsset;
 //struct FSkeletalMeshRenderData;
 
 class USkeletalMesh : public USkinnedAsset
@@ -26,4 +27,6 @@ protected:
     std::unique_ptr<FSkeletalMeshRenderData> RenderData;
 
     USkeleton* Skeleton;
+
+    UPhysicsAsset* PhysicsAsset;
 };
