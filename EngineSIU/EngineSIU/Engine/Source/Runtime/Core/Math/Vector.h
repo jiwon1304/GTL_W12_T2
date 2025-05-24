@@ -1,10 +1,11 @@
-﻿#pragma once
+#pragma once
 #include <cassert>
 #include <compare>
 #include "MathUtility.h"
 #include "Serialization/Archive.h"
 
 #include "Rotator.h"
+#include <foundation/PxVec3.h>
 
 struct FVector2D
 {
@@ -226,6 +227,13 @@ public:
 
     FString ToString() const;
     bool InitFromString(const FString& InSourceString);
+
+    // PhysX 
+public:
+    physx::PxVec3 ToPxVec3() const
+    {
+        return physx::PxVec3(X, Y, Z);
+    }
 };
 
 inline FVector::FVector(const FRotator& InRotator)

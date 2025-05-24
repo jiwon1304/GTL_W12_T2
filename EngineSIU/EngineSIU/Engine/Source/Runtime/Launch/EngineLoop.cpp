@@ -17,6 +17,7 @@
 #include "SubWindow/ParticleSubEngine.h"
 #include "SubWindow/ImGuiSubWindow.h"
 #include "SoundManager.h"
+#include "Physics/PhysXManager.h"
 
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
 
@@ -54,6 +55,7 @@ int32 FEngineLoop::Init(HINSTANCE hInstance)
     UIManager = new UImGuiManager;
     AppMessageHandler = std::make_unique<FSlateAppMessageHandler>();
     LevelEditor = new SLevelEditor();
+    FPhysXManager::Get().Init();
 
     UnrealEditor->Initialize();
     GraphicDevice.Initialize(AppWnd);

@@ -2,6 +2,7 @@
 #include "MathUtility.h"
 #include "Rotator.h"
 #include "Serialization/Archive.h"
+#include <foundation/PxQuat.h>
 
 struct FVector;
 struct FMatrix;
@@ -153,6 +154,8 @@ public:
     FString ToString() const;
 
     bool IsIdentity() const;
+    // physx
+    physx::PxQuat ToPxQuat() const;
 };
 
 inline FArchive& operator<<(FArchive& Ar, FQuat& Q)

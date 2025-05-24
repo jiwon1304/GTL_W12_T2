@@ -3,6 +3,9 @@
 #include "Vector.h"
 #include "Container/String.h"
 #include "Serialization/Archive.h"
+#include <foundation/PxTransform.h>
+#include <foundation/PxVec3.h>
+#include <foundation/PxQuat.h>
 
 struct FTransform
 {
@@ -110,5 +113,11 @@ struct FTransform
         return Ar << Transform.Translation
                   << Transform.Rotation
                   << Transform.Scale3D;
+    }
+
+    // PhysX 관련
+    physx::PxTransform ToPxTransform() const
+    {
+        return physx::PxTransform(Translation.ToPxVec3(), Rotation.ToPxQuat());
     }
 };

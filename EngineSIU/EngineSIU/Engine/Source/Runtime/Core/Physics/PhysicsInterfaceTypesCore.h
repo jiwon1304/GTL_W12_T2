@@ -2,4 +2,4 @@
 #include <PxPhysicsAPI.h>
 
 using namespace physx;
-typedef PxScene             FPhysXScene;
+using FPhysicsActorHandle   = PxRigidActor;

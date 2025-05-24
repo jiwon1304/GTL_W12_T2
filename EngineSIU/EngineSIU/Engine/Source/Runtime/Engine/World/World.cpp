@@ -16,6 +16,8 @@
 #include "GameFramework/GameMode.h"
 #include "Classes/Components/TextComponent.h"
 #include "Contents/Actors/Fish.h"
+#include "Physics/PhysXManager.h"
+#include "Physics/PhysScene.h"
 
 class UEditorEngine;
 
@@ -37,6 +39,9 @@ void UWorld::InitializeNewWorld()
     //InitializeLightScene(); // 테스트용 LightScene 비활성화
 
     CollisionManager = new FCollisionManager();
+    
+    // Initialize하는 시점에 PhysicsScene을 생성함.
+    SetPhysicsScene(CreatePhysicsScene());
 }
 
 void UWorld::InitializeLightScene()
@@ -339,5 +344,40 @@ void UWorld::CheckOverlap(const UPrimitiveComponent* Component, TArray<FOverlapR
     {
         CollisionManager->CheckOverlap(this, Component, OutOverlaps);
     }
+}
+
+FPhysScene* UWorld::CreatePhysicsScene()
+{
+    return FPhysXManager::Get().CreatePhysScene(this);
+}
+
+void UWorld::SetPhysicsScene(FPhysScene* InPhysicsScene)
+{
+    if (PhysicsScene)
+    {
+        FPhysXManager::Get().ReleasePhysScene(PhysicsScene);
+    }
+    PhysicsScene = InPhysicsScene;
+    if (PhysicsScene == nullptr)
+    {
+        UE_LOG(ELogLevel::Error, TEXT("Failed to create PhysicsScene."));
+    }
+}
+
+void UWorld::StartSimulate()
+{
+    if (PhysicsScene == nullptr)
+    {
+        UE_LOG(ELogLevel::Error, TEXT("PhysicsScene is not initialized. Call CreatePhysicsScene() first."));
+        return;
+    }
+}
+
+void UWorld::StopSimulate()
+{
+}
+
+void UWorld::EndSimulate()
+{
 }
 

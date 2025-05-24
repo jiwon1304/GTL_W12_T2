@@ -3,6 +3,7 @@
 #include "Vector.h"
 #include "Matrix.h"
 
+
 const FQuat FQuat::Identity = FQuat{0.0f, 0.0f, 0.0f, 1.0f};
 
 FQuat::FQuat(const FVector& Axis, float AngleRad)
@@ -387,4 +388,9 @@ FString FQuat::ToString() const
 bool FQuat::IsIdentity() const
 {
     return X == 0.0f && Y == 0.0f && Z == 0.0f && W == 1.0f;
+}
+
+physx::PxQuat FQuat::ToPxQuat() const
+{
+    return physx::PxQuat(X,Y,Z,W);
 }

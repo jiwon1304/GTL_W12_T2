@@ -12,6 +12,7 @@
 #include "Engine/Engine.h"
 #include "Engine/EventManager.h"
 #include "UObject/UObjectIterator.h"
+#include "Physics/PhysicsInterfaceTypesCore.h"
 
 class UPrimitiveComponent;
 struct FOverlapResult;
@@ -23,6 +24,7 @@ class USceneComponent;
 class FCollisionManager;
 class AGameMode;
 class UTextComponent;
+struct FPhysScene;
 
 class UWorld : public UObject
 {
@@ -82,6 +84,22 @@ public:
     
     void CheckOverlap(const UPrimitiveComponent* Component, TArray<FOverlapResult>& OutOverlaps) const;
 
+    FPhysScene* GetPhysicsScene() const { return PhysicsScene; }
+
+    // Physics을 생성.
+    FPhysScene* CreatePhysicsScene();
+
+    // PhysicsScene을 설정. 월드 생성 시 호출.
+    void SetPhysicsScene(FPhysScene* InPhysicsScene);
+
+    // 물리 시뮬레이션 시작. FPhyScene이 세팅돼있어야 함.
+    void StartSimulate();
+
+    void StopSimulate();
+
+    void EndSimulate();
+
+
 public:
     double TimeSeconds;
 
@@ -106,6 +124,8 @@ private:
     UTextComponent* MainTextComponent = nullptr;
 
     FCollisionManager* CollisionManager = nullptr;
+
+    FPhysScene* PhysicsScene = nullptr;
 };
 
 

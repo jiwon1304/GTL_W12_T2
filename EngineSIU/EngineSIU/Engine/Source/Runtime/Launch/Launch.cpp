@@ -12,7 +12,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     UNREFERENCED_PARAMETER(lpCmdLine);
     UNREFERENCED_PARAMETER(nShowCmd);
 
-    InitPhysX();
+    //InitPhysX();
 
     GEngineLoop.Init(hInstance);
     GEngineLoop.Tick();

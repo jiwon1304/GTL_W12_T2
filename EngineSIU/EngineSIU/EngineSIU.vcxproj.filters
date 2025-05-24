@@ -1710,6 +1710,9 @@
     <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Particles\ParticleModules\ParticleModuleColorOverLife.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Particles\ParticleModules\ParticleModuleSubUV.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Physics\PhysXIntegration.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Core\Physics\PhysXManager.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Core\Physics\BodyInstance.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Core\Physics\PhysicsEngineInterface.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="EngineSIU.natvis" />
@@ -2013,6 +2016,18 @@
     <ClInclude Include="Engine\Source\ThirdParty\physx\include\foundation\PxVec2.h" />
     <ClInclude Include="Engine\Source\ThirdParty\physx\include\foundation\PxVec3.h" />
     <ClInclude Include="Engine\Source\ThirdParty\physx\include\foundation\PxVec4.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Physics\AggregateGeom.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Physics\BodyInstance.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Physics\BodySetup.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Physics\BodySetupCore.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Physics\BoxElem.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Physics\PhysicsEngineInterface.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Physics\PhysicsInterfaceTypesCore.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Physics\PhysXManager.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Physics\ShapeElem.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Physics\SphereElem.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Physics\SphylElem.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Physics\PhysScene.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\CompositingShader.hlsl" />

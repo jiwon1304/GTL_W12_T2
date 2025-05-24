@@ -453,6 +453,66 @@ void UPrimitiveComponent::GetOverlappingComponents(TSet<UPrimitiveComponent*>& O
     }
 }
 
+bool UPrimitiveComponent::IsSimulatingPhysics(FName BoneName)
+{
+    if (FBodyInstance * BodyInst = GetBodyInstance(BoneName))
+    {
+        return GetBodyInstance(BoneName)->IsInstanceSimulatingPhysics();
+    }
+    return false;
+}
+
+FBodyInstance* UPrimitiveComponent::GetBodyInstance(const FName& BoneName, bool bGetWelded, int32 Index)
+{
+    // !TODO : Weld 처리
+    return &BodyInstance;
+}
+
+void UPrimitiveComponent::SyncComponentToRBPhysics()
+{
+    FBodyInstance* UseBI = GetBodyInstance();
+
+    if (UseBI == nullptr)
+    {
+        UE_LOG(ELogLevel::Error, TEXT("SyncComponentToRBPhysics called on a component with no BodyInstance!"));
+        return;
+    }
+
+    AActor* Owner = GetOwner();
+    if (Owner && Owner->IsActorBeingDestroyed())
+    {
+        UE_LOG(ELogLevel::Warning, TEXT("SyncComponentToRBPhysics called on a component with an owner that is being destroyed!"));
+        return;
+    }
+
+    FTransform WorldTransform = UseBI->GetUnrealWorldTransform();
+
+    const FVector MoveBy = WorldTransform.GetTranslation() - GetComponentLocation();
+    const FRotator NewRotation = WorldTransform.GetRotation().Rotator();
+
+    MoveComponent(MoveBy, NewRotation, false, nullptr);
+}
+
+void UPrimitiveComponent::OnUpdateTransform()
+{
+    SendPhysicsTransform();
+}
+
+
+void UPrimitiveComponent::SendPhysicsTransform()
+{
+    FBodyInstance* UseBI = GetBodyInstance();
+    if (UseBI && UseBI->IsValid())
+    {
+        UseBI->SetBodyTransform(GetComponentTransform());
+        UseBI->UpdateBodyScale(GetComponentTransform().GetScale3D());
+    }
+    else
+    {
+        UE_LOG(ELogLevel::Error, TEXT("SendPhysicsTransform called on a component with Invaid BodyInstance!"));
+    }
+}
+
 const TArray<FOverlapInfo>& UPrimitiveComponent::GetOverlapInfos() const
 {
     return OverlappingComponents;

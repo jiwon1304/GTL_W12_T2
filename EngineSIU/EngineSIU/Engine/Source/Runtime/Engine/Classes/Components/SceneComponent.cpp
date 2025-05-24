@@ -154,25 +154,25 @@ FVector USceneComponent::GetUpVector() const
 
 void USceneComponent::AddLocation(const FVector& InAddValue)
 {
-    RelativeLocation = RelativeLocation + InAddValue;
-
+    MoveComponent(InAddValue, RelativeRotation, false, nullptr);
 }
 
 void USceneComponent::AddRotation(const FRotator& InAddValue)
 {
     FQuat Quat = InAddValue.Quaternion()* RelativeRotation.Quaternion();
-    SetWorldRotation(Quat); 
+    MoveComponent(FVector::ZeroVector, Quat, false, nullptr);
 }
 
 void USceneComponent::AddRotation(const FQuat& InAddValue)
 {
     FQuat Quat = InAddValue * RelativeRotation.Quaternion();
-    SetWorldRotation(Quat);
+    MoveComponent(FVector::ZeroVector, Quat, false, nullptr);
 }
 
 void USceneComponent::AddScale(const FVector& InAddValue)
 {
     RelativeScale3D = RelativeScale3D + InAddValue;
+    OnUpdateTransform();
 }
 
 void USceneComponent::AttachToComponent(USceneComponent* InParent)
@@ -410,6 +410,11 @@ bool USceneComponent::MoveComponent(const FVector& Delta, const FRotator& NewRot
     return MoveComponentImpl(Delta, NewRotation.Quaternion(), bSweep, OutHit);
 }
 
+void USceneComponent::OnUpdateTransform()
+{
+    UE_LOG(ELogLevel::Warning, TEXT("OnUpdateTransform called for %s"), *GetName());
+}
+
 void USceneComponent::UpdateOverlapsImpl(const TArray<FOverlapInfo>* PendingOverlaps, bool bDoNotifies, const TArray<const FOverlapInfo>* OverlapsAtEndLocation)
 {
     TArray<USceneComponent*> AttachedChildren(AttachChildren);
@@ -444,6 +449,7 @@ bool USceneComponent::MoveComponentImpl(const FVector& Delta, const FQuat& NewRo
         SetWorldRotation(NewRotation);
 
         UpdateOverlaps();
+        OnUpdateTransform();
     }
 
     return true;

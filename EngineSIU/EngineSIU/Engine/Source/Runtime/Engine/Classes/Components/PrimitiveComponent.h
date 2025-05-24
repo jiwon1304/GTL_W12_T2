@@ -94,6 +94,26 @@ public:
     /** Returns unique set of components this component is overlapping. */
     void GetOverlappingComponents(TSet<UPrimitiveComponent*>& OutOverlappingComponents) const;
 
+    virtual bool IsSimulatingPhysics(FName BoneName = NAME_None);
+
+    /**
+     * Returns BodyInstance of the component.
+    *
+    * @param BoneName				Used to get body associated with specific bone. NAME_None automatically gets the root most body
+    * @param bGetWelded				If the component has been welded to another component and bGetWelded is true we return the single welded BodyInstance that is used in the simulation
+    * @param Index					Index used in Components with multiple body instances
+    *
+    * @return		Returns the BodyInstance based on various states (does component have multiple bodies? Is the body welded to another body?)
+    */
+    FBodyInstance* GetBodyInstance(const FName& BoneName = NAME_None, bool bGetWelded = true, int32 Index = 0);
+
+    /** Move this component to match the physics rigid body pose. Note, a warning will be generated if you call this function on a component that is attached to something */
+    void SyncComponentToRBPhysics();
+
+    virtual void OnUpdateTransform();
+
+    void SendPhysicsTransform();
+
     /** Returns list of components this component is overlapping. */
     const TArray<FOverlapInfo>& GetOverlapInfos() const;
 

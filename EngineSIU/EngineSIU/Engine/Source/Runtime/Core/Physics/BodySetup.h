@@ -1,13 +1,16 @@
 #pragma once
-#include "UObject/Object.h"
-#include "UObject/ObjectMacros.h"
+#include "BodySetupCore.h"
+#include "AggregateGeom.h"
 
-class UBodySetup : UObject
+class UBodySetup : UBodySetupCore
 {
     DECLARE_CLASS(UBodySetup, UObject)
 public:
     UBodySetup() = default;
     virtual ~UBodySetup() override = default;
 
-    struct FKAggregateGeom AggGeom;
+    UPROPERTY_WITH_FLAGS(
+        EditAnywhere,
+        FKAggregateGeom, AggGeom
+    )
 };
