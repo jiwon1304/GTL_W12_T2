@@ -8,4 +8,6 @@ class UBodySetup : UObject
 public:
     UBodySetup() = default;
     virtual ~UBodySetup() override = default;
+
+    struct FKAggregateGeom AggGeom;
 };

@@ -10,4 +10,9 @@ struct FBodyInstance
 {
     DECLARE_STRUCT(FBodyInstance)
     UPrimitiveComponent* OwnerComponent;
+
+    UPROPERTY_WITH_FLAGS(
+        EditAnywhere,
+        bool, CollisionEnabled, = false
+    )
 };
