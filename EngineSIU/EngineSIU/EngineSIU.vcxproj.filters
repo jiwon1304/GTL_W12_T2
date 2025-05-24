@@ -412,6 +412,12 @@
     <Filter Include="Shaders">
       <UniqueIdentifier>{E3A8C30B-703E-4852-A481-C2F5945B1CF8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Engine\Source\Runtime\Physics\PhysicAsset">
+      <UniqueIdentifier>{2f8554f8-c6ef-4c73-91bd-e98deeb67f36}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Source\Runtime\Physics\PhysicsEngine">
+      <UniqueIdentifier>{61b8d0d7-6ea7-4d06-bc1a-70ec7b5e92c7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="LightGridGenerator.cpp" />
@@ -2013,6 +2019,24 @@
     <ClInclude Include="Engine\Source\ThirdParty\physx\include\foundation\PxVec2.h" />
     <ClInclude Include="Engine\Source\ThirdParty\physx\include\foundation\PxVec3.h" />
     <ClInclude Include="Engine\Source\ThirdParty\physx\include\foundation\PxVec4.h" />
+    <ClInclude Include="Engine\Source\Runtime\Physics\PhysicAsset\FKElements.h">
+      <Filter>Engine\Source\Runtime\Physics\PhysicAsset</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Source\Runtime\Physics\PhysicAsset\AggregateGeom.h">
+      <Filter>Engine\Source\Runtime\Physics\PhysicAsset</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Source\Runtime\Physics\PhysicAsset\BodySetup.h">
+      <Filter>Engine\Source\Runtime\Physics\PhysicAsset</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Source\Runtime\Physics\PhysicAsset\BodySetupCore.h">
+      <Filter>Engine\Source\Runtime\Physics\PhysicAsset</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Source\Runtime\Physics\PhysicsEngine\BodyInstance.h">
+      <Filter>Engine\Source\Runtime\Physics\PhysicsEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Source\Runtime\Physics\PhysicsEngine\ContraintInstance.h">
+      <Filter>Engine\Source\Runtime\Physics\PhysicsEngine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\CompositingShader.hlsl" />

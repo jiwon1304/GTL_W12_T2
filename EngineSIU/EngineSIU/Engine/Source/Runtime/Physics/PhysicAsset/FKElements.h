@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Define.h"
 #include "Engine/Classes/Engine/EngineTypes.h"
 #include "Engine/Source/Runtime/Core/Math/Transform.h"
