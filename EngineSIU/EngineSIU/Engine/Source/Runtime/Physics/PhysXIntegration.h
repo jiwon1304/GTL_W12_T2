@@ -6,6 +6,8 @@
 #include <DirectXMath.h>
 #include <vector>
 
+#include "Engine/Source/Runtime/Physics/PhysicsEngine/PhysicsType.h"
+
 using namespace physx;
 using namespace DirectX;
 
@@ -18,10 +20,13 @@ extern PxScene* gScene;
 extern PxMaterial* gMaterial;
 extern PxDefaultCpuDispatcher* gDispatcher;
 
+struct FBodyInstance;
+
 // 게임 오브젝트
 struct GameObject {
-    PxRigidDynamic* rigidBody = nullptr;
+    PxRigidActor* rigidBody = nullptr;
     XMMATRIX worldMatrix = XMMatrixIdentity();
+    FBodyInstance* BodyInstance = nullptr;
 
     void UpdateFromPhysics();
 };
@@ -30,7 +35,11 @@ extern std::vector<GameObject> gObjects;
 
 void InitPhysX();
 
+void ReleasePhysX();
+
 GameObject CreateBox(const PxVec3& pos, const PxVec3& halfExtents);
+
+GameObject CreateGameObject(EPhysicsType PhysicsType, const PxVec3& pos, const float density = 10.0f);
 
 void Simulate(float dt);
 

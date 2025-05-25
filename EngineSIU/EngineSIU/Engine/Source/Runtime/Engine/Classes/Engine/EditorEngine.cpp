@@ -14,6 +14,10 @@
 #include "Components/Light/DirectionalLightComponent.h"
 #include "LevelEditor/SLevelEditor.h"
 #include "Editor/UnrealEd/EditorViewportClient.h"
+#include "Engine/Source/Runtime/Physics/PhysXIntegration.h"
+#include "Engine/Classes/Components/StaticMeshComponent.h"
+#include "Engine/Source/Runtime/CoreUObject/UObject/Casts.h"
+#include "Engine/Source/Runtime/InteractiveToolsFramework//BaseGizmos/GizmoBaseComponent.h"
 
 extern FEngineLoop GEngineLoop;
 
@@ -105,6 +109,11 @@ void UEditorEngine::Tick(float DeltaTime)
                         }
                     }
                 }
+
+                if (gScene != nullptr) 
+                {
+                    Simulate(DeltaTime);
+                }
             }
         }
         else if (WorldContext->WorldType == EWorldType::SkeletalViewer)
@@ -157,6 +166,8 @@ void UEditorEngine::StartPIE()
     PIEWorld->BeginPlay();
     // 여기서 Actor들의 BeginPlay를 해줄지 안에서 해줄 지 고민.
     // WorldList.Add(GetWorldContextFromWorld(PIEWorld));
+
+    StartPhysicsScene();
 }
 
 void UEditorEngine::StartSkeletalMeshViewer(FName SkeletalMeshName, UAnimationAsset* AnimAsset)
@@ -264,6 +275,8 @@ void UEditorEngine::EndPIE()
 {
     if (PIEWorld)
     {
+        ReleasePhysX();
+
         this->ClearActorSelection(); // PIE World 기준 Select Actor 해제 
         WorldList.Remove(GetWorldContextFromWorld(PIEWorld));
         PIEWorld->Release();
@@ -304,6 +317,20 @@ void UEditorEngine::EndSkeletalMeshViewer()
     if (AEditorPlayer* Player = GetEditorPlayer())
     {
         Player->SetCoordMode(ECoordMode::CDM_WORLD);
+    }
+}
+
+void UEditorEngine::StartPhysicsScene()
+{
+    InitPhysX();
+
+    // 1. StaticMeshComponent를 돌며 Physics 사용 여부 및 BodySetup을 통해 rigidbody 생성
+    for (const auto iter : TObjectRange<UStaticMeshComponent>()) 
+    {
+        if (!Cast<UGizmoBaseComponent>(iter) && iter->GetWorld() == GEngine->ActiveWorld) {
+            iter->BodyInstance.OwnerComponent = iter;
+            iter->BodyInstance.CreatePhysXActor();
+        }
     }
 }
 

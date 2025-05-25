@@ -34,6 +34,10 @@ public:
     void EndPIE();
     void EndSkeletalMeshViewer();
 
+    void StartPhysicsScene();
+
+    void GenerateRigidbody(UStaticMeshComponent* StaticMeshComoponent);
+
     // 주석은 UE에서 사용하던 매개변수.
     FWorldContext& GetEditorWorldContext(/*bool bEnsureIsGWorld = false*/);
     FWorldContext* GetPIEWorldContext(/*int32 WorldPIEInstance = 0*/);

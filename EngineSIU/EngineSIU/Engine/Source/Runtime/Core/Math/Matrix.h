@@ -4,6 +4,9 @@
 #include "MathUtility.h"
 #include "Serialization/Archive.h"
 
+#include <DirectXMath.h>
+#include <PxPhysicsAPI.h>
+
 // 4x4 행렬 연산
 struct alignas(16) FMatrix
 {
@@ -69,6 +72,42 @@ public:
     void RemoveScaling(float Tolerance = SMALL_NUMBER);
 
     bool Equals(const FMatrix& Other, float Tolerance = KINDA_SMALL_NUMBER) const;
+
+    static FMatrix FromXMMATRIX(const DirectX::XMMATRIX& In)
+    {
+        FMatrix Out;
+        // XMMATRIX stores rows in r[0]..r[3]
+        for (int Row = 0; Row < 4; ++Row)
+        {
+            // m128_f32 holds 4 floats
+            const float* Src = reinterpret_cast<const float*>(&In.r[Row]);
+            for (int Col = 0; Col < 4; ++Col)
+            {
+                Out.M[Row][Col] = Src[Col];
+            }
+        }
+        return Out;
+    }
+
+    /**
+     * PhysX PxMat44 -> FMatrix 변환
+     */
+    static FMatrix FromPxMat44(const physx::PxMat44& In)
+    {
+        FMatrix Out;
+        // PxMat44 stores in column-major order, 4 floats per column
+        const physx::PxReal* Src = In.front();
+        for (int Row = 0; Row < 4; ++Row)
+        {
+            for (int Col = 0; Col < 4; ++Col)
+            {
+                // column-major to row-major
+                //Out.M[Row][Col] = Src[Col * 4 + Row];
+                Out.M[Row][Col] = Src[Row * 4 + Col];
+            }
+        }
+        return Out;
+    }
 };
 
 inline FArchive& operator<<(FArchive& Ar, FMatrix& M)

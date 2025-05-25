@@ -1716,6 +1716,9 @@
     <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Particles\ParticleModules\ParticleModuleColorOverLife.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Particles\ParticleModules\ParticleModuleSubUV.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Physics\PhysXIntegration.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Physics\PhysicsEngine\BodyInstance.cpp">
+      <Filter>Engine\Source\Runtime\Physics\PhysicsEngine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="EngineSIU.natvis" />
@@ -2035,6 +2038,9 @@
       <Filter>Engine\Source\Runtime\Physics\PhysicsEngine</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Source\Runtime\Physics\PhysicsEngine\ContraintInstance.h">
+      <Filter>Engine\Source\Runtime\Physics\PhysicsEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Source\Runtime\Physics\PhysicsEngine\PhysicsType.h">
       <Filter>Engine\Source\Runtime\Physics\PhysicsEngine</Filter>
     </ClInclude>
   </ItemGroup>

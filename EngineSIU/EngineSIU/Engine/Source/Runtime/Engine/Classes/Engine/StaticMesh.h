@@ -21,6 +21,9 @@ public:
     void GetUsedMaterials(TArray<UMaterial*>& OutMaterial) const;
     FStaticMeshRenderData* GetRenderData() const { return RenderData; }
 
+    UBodySetup* GetBodySetup() { return BodySetup; }
+    void SetBodySetup(UBodySetup* InBodySetup) { BodySetup = InBodySetup; }
+
     //ObjectName은 경로까지 포함
     FWString GetOjbectName() const;
 

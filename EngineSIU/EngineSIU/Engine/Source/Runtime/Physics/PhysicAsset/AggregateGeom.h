@@ -4,8 +4,13 @@
 
 struct FKAggregateGeom 
 {
-    TArray<FKSphereElem> SPhereElems;
+    TArray<FKSphereElem> SphereElems;
     TArray<FKBoxElem> BoxElems;
-    TArray<FKSphylElem> SPhylElems;
+    TArray<FKSphylElem> SphylElems;
     TArray<FKConvexElem> ConvexElems;
+
+    inline uint32 GetElementsCount() 
+    {
+        return (SphereElems.Num() + BoxElems.Num() + SphylElems.Num() + ConvexElems.Num());
+    }
 };

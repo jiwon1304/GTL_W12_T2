@@ -34,6 +34,8 @@ public:
     bool bGenerateOverlapEvents = true;
     bool bBlockComponent = true;
 
+    bool bSimulatePhysics = false;
+
     FComponentHitSignature OnComponentHit;
 
     FComponentBeginOverlapSignature OnComponentBeginOverlap;
