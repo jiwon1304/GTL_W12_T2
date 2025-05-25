@@ -46,7 +46,7 @@ public:
     FPhysicsSolver* GetSolver() const { return SceneSolver; }
 private:
     // PxActor -> FBodyInstance는 PxActor->usrerData를 통해서 가져올 수 있습니다.
-    TMap<FBodyInstance*, physx::PxActor*> RegisteredInstances;
+    //TMap<FBodyInstance*, physx::PxActor*> RegisteredInstances;
     
     FPhysicsSolver* SceneSolver = nullptr;
 

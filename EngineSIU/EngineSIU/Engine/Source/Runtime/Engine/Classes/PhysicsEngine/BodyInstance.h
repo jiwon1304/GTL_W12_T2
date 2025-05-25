@@ -44,7 +44,7 @@ struct FBodyInstance
         EditAnywhere,
         ECollisionChannel,
         ObjectType,
-        = ECollisionChannel::ECC_WorldDynamic
+        = ECollisionChannel::ECC_WorldStatic
     )
 
     // 충돌할 때 어떻게 처리되어야하는지

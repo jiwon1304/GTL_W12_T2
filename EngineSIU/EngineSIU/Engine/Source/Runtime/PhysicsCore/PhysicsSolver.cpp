@@ -53,7 +53,7 @@ PxActor* FPhysicsSolver::RegisterObject(FPhysScene* InScene, const FBodyInstance
         return nullptr;
     }
 
-    FMatrix InitialMatrix = NewInstance->OwnerComponent->GetWorldMatrix();
+    FMatrix InitialMatrix = NewInstance->OwnerComponent->GetWorldMatrix().GetMatrixWithoutScale();
     FVector InitialPosition = InitialMatrix.GetTranslationVector();
     FQuat InitialRotation = InitialMatrix.ToQuat();
     
@@ -83,6 +83,22 @@ PxActor* FPhysicsSolver::RegisterObject(FPhysScene* InScene, const FBodyInstance
     float Mass = NewInstance->MassScale 
         * NewInstance->ExternalCollisionProfileBodySetup->PhysMaterial->Density * Volume;
     physx::PxRigidBodyExt::updateMassAndInertia(*NewDynamic, NewInstance->MassScale);
+
+    ECollisionChannel Channel = NewInstance->ObjectType;
+    switch (Channel)
+    {
+    case ECollisionChannel::ECC_WorldStatic:
+        NewDynamic->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
+        NewDynamic->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, true);
+        break;
+    case ECollisionChannel::ECC_WorldDynamic:
+        NewDynamic->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, false);
+        NewDynamic->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, false);
+        break;
+    default:
+        assert(0);
+        break;
+    }
     Scene->addActor(*NewDynamic);
 
     return NewDynamic;
@@ -98,33 +114,29 @@ void FPhysicsSolver::FetchData(FPhysScene* InScene)
     InScene->PhysxScene->fetchResults(true);
 
     PxScene* Scene = InScene->PhysxScene;
-    // 이렇게 해도 되고, 아니면 Actor에서 userdata를 가져와서 해도 되고...
-    for (auto& Elem : InScene->RegisteredInstances)
-    {
-        FBodyInstance* BodyInstance = Elem.Key;
-        PxActor* Actor = Elem.Value;
+    PxU32 TotalActors = Scene->getNbActors(
+        PxActorTypeFlag::eRIGID_DYNAMIC
+    );
+    PxActor** Actors = new PxActor* [TotalActors];
 
-        switch (BodyInstance->ObjectType)
-        {
-        case ECollisionChannel::ECC_WorldDynamic:
-        {
-            PxRigidDynamic* DynamicActor = Actor->is<PxRigidDynamic>();
-            if (DynamicActor)
-            {
-                PxTransform Transform = DynamicActor->getGlobalPose();
-                BodyInstance->OwnerComponent->SetWorldTransform(
-                    FTransform(
-                        FQuat(Transform.q.x, Transform.q.y, Transform.q.z, Transform.q.w),
-                        FVector(Transform.p.x, Transform.p.y, Transform.p.z),
-                        FVector(BodyInstance->Scale3D.X, BodyInstance->Scale3D.Y, BodyInstance->Scale3D.Z)
-                    )
-                );
-            }
-            break;
-        }
-        default:
-            assert(0);
-        }
+    PxU32 NumReturnActors = Scene->getActors(
+        PxActorTypeFlag::eRIGID_DYNAMIC,
+        Actors, TotalActors
+    );
+
+    for (PxU32 i = 0; i < NumReturnActors; ++i)
+    {
+        PxRigidDynamic* DynamicActor = Actors[i]->is<PxRigidDynamic>();
+        PxTransform Transform = DynamicActor->getGlobalPose();
+
+        FBodyInstance* BodyInstance = static_cast<FBodyInstance*>(DynamicActor->userData);
+        BodyInstance->OwnerComponent->SetWorldTransform(
+            FTransform(
+                FQuat(Transform.q.x, Transform.q.y, Transform.q.z, Transform.q.w),
+                FVector(Transform.p.x, Transform.p.y, Transform.p.z),
+                FVector(BodyInstance->Scale3D.X, BodyInstance->Scale3D.Y, BodyInstance->Scale3D.Z)
+            )
+        );
     }
 }
 

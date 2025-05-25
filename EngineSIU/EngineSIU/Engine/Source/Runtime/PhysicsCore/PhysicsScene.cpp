@@ -51,7 +51,7 @@ void FPhysScene::AddActor(AActor* Actor)
             BodyInstance->OwnerComponent = StaticMeshComponent;
             PxActor* RegisteredActor = SceneSolver->RegisterObject(this, BodyInstance);
 
-            RegisteredInstances.Add(BodyInstance, RegisteredActor);
+            //RegisteredInstances.Add(BodyInstance, RegisteredActor);
         }
     }
 

@@ -14,7 +14,7 @@ namespace EBodyCollisionResponse
 
 class UBodySetupCore : public UObject
 {
-    DECLARE_ABSTRACT_CLASS(UBodySetupCore, UObject)
+    DECLARE_CLASS(UBodySetupCore, UObject)
 
 public:
     UBodySetupCore() = default;

@@ -23,6 +23,7 @@ public:
         EditAnywhere,
         FBodyInstance,
         DefaultInstance,
+        {}
     )
 
     UPROPERTY(
