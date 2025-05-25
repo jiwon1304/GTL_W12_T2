@@ -17,6 +17,7 @@
 #include "Classes/Components/TextComponent.h"
 #include "Contents/Actors/Fish.h"
 #include "PhysicsCore/PhysxSolversModule.h"
+#include "PhysicsCore/PhysicsScene.h"
 
 class UEditorEngine;
 
@@ -123,6 +124,12 @@ void UWorld::Tick(float DeltaTime)
             Actor->BeginPlay();
         }
         PendingBeginPlayActors.Empty();
+        
+        if (PhysicsScene)
+        {
+            PhysicsScene->AdvanceAndDispatch_External(DeltaTime);
+            PhysicsScene->SyncBodies();
+        }
     }
 }
 
@@ -189,7 +196,8 @@ void UWorld::BeginPlay()
             });
 
         CreatePhysicsScene();
-        PhysicsScene->SetGravity(FVector(0, 0, -10));
+
+        PhysicsScene->SetGravity(FVector(0, 0, -98));
 
         GameMode->InitGame();
     }

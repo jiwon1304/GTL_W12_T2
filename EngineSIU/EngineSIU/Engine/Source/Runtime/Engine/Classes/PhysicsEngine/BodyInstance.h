@@ -154,12 +154,12 @@ public:
     )
     
     // 이 물체를 가지고 있는 PrimitiveComponent (필요시)
-    class UPrimitiveComponent* OwnerComponent;
+    class UPrimitiveComponent* OwnerComponent = nullptr;
 
     // 이 물체를 가지고 있는 UObject (보통은 OwnerComponent의 Owner)
-    class UObject* OwnerObject;
+    class UObject* OwnerObject = nullptr;
 
     // default body instance와 collision profile을 가진 셋업
     // 물체의 모양이 여기 들어있음
-    class UBodySetup* ExternalCollisionProfileBodySetup;
+    class UBodySetup* ExternalCollisionProfileBodySetup = nullptr;
 };

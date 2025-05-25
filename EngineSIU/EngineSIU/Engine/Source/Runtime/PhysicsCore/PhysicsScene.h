@@ -40,7 +40,8 @@ public:
 
     float DeltaTime = 0.0f;
 
-    void SetGravity();
+    FVector Gravity = FVector(0,0,-98.f);
+    void SetGravity(FVector InGravity);
 
     FPhysicsSolver* GetSolver() const { return SceneSolver; }
 private:

@@ -4,13 +4,14 @@
 
 // FChaosPhysicsMaterial
 
-
 // FChaosPhysicsMaterial을 기준으로 작성
 struct FPhysicsMaterial
 {
     DECLARE_STRUCT(FPhysicsMaterial)
+
     // 물리 엔진에서 사용
-    struct FPhysxUserData* UserData;
+    struct FPhysxUserData* UserData = nullptr;
+
     // 물리 재질의 밀도
     UPROPERTY(
         EditAnywhere,
@@ -39,6 +40,4 @@ struct FPhysicsMaterial
         Restitution,
         = 0.5f
     )
-
-    void* UserData;
 };

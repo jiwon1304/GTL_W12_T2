@@ -12,7 +12,6 @@
 #include "Engine/Engine.h"
 #include "Engine/EventManager.h"
 #include "UObject/UObjectIterator.h"
-#include "PhysicsCore/PhysicsScene.h"
 
 class UPrimitiveComponent;
 struct FOverlapResult;
@@ -24,6 +23,7 @@ class USceneComponent;
 class FCollisionManager;
 class AGameMode;
 class UTextComponent;
+class FPhysScene;
 
 class UWorld : public UObject
 {

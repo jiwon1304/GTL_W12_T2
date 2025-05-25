@@ -1,6 +1,6 @@
 #pragma once
 #include "CoreUObject/UObject/ObjectMacros.h"
-#include "EngineTypes.h"
+#include "Engine/EngineTypes.h"
 
 namespace EAggCollisionShape
 {
@@ -32,7 +32,7 @@ struct FKShapeElem
 
     EAggCollisionShape::Type ShapeType;
 
-    ECollisionEnabled::Type CollisionEnabled;
+    ECollisionEnabled::Type CollisionEnabled = ECollisionEnabled::Type::PhysicsOnly;
 };
 
 struct FKBoxElem : public FKShapeElem

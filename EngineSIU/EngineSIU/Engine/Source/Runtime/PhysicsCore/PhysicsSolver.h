@@ -34,7 +34,6 @@ public:
 
     PxActor* RegisterObject(FPhysScene* InScene, const FBodyInstance* NewInstance);
     // 시뮬레이션 이전 최신값을 반영
-    void UpdateBodyFromComponent();
 
     // 물리 시뮬레이션을 특정 시간에 대해서 진행
     void AdvanceOneTimeStep(FPhysScene* InScene, float Dt);
@@ -42,12 +41,6 @@ public:
     void FetchData(FPhysScene* InScene);
 
     PxGeometryType::Enum GetPxType(const FKShapeElem* InShape);
-
-    // 파티클(물리 객체) 추가/삭제
-    void AddBody(UShapeComponent* Component);
-    void RemoveBody(UShapeComponent* Component);
-    FPhysicsBody* GetBody(const UShapeComponent* Component);
-
 private:
 
 protected:

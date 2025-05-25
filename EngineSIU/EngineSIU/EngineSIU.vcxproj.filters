@@ -1704,10 +1704,10 @@
     <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Particles\ParticleModules\ParticleModuleColorOverLife.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Particles\ParticleModules\ParticleModuleSubUV.cpp" />
     <ClCompile Include="Engine\Source\Runtime\PhysicsCore\CollisionManager.cpp" />
-    <ClCompile Include="Engine\Source\Runtime\PhysicsCore\PhysicsScene.cpp" />
     <ClCompile Include="Engine\Source\Runtime\PhysicsCore\PhysicsSolver.cpp" />
     <ClCompile Include="Engine\Source\Runtime\PhysicsCore\PhysXIntegration.cpp" />
     <ClCompile Include="Engine\Source\Runtime\PhysicsCore\PhysxSolversModule.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\PhysicsCore\PhysicsScene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="EngineSIU.natvis" />

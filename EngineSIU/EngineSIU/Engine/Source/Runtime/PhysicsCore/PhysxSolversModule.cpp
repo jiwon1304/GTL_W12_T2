@@ -29,7 +29,7 @@ void FPhysxSolversModule::Initialize()
     Pvd->connect(*PvdTransport, PxPvdInstrumentationFlag::eALL);
 
     Physics = PxCreatePhysics(PX_PHYSICS_VERSION, *Foundation, PxTolerancesScale(), true, Pvd);
-#elif
+#else
     Physics = PxCreatePhysics(PX_PHYSICS_VERSION, *Foundation, PxTolerancesScale());
 #endif
 

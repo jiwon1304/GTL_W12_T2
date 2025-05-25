@@ -8,8 +8,6 @@
 #include "Components/StaticMeshComponent.h"
 #include "PhysicsEngine/BodySetup.h"
 
-
-
 void FPhysScene::Init(FPhysicsSolver* InSceneSolver, physx::PxScene* InScene)
 {
     if (!InSceneSolver)
@@ -47,7 +45,10 @@ void FPhysScene::AddActor(AActor* Actor)
                 continue;
             }
             
-            FBodyInstance* BodyInstance = &StaticMesh->GetBodySetup()->DefaultInstance;
+            // 복사해서 붙여줌
+            FBodyInstance* BodyInstance = new FBodyInstance(StaticMesh->GetBodySetup()->DefaultInstance);
+            
+            BodyInstance->OwnerComponent = StaticMeshComponent;
             PxActor* RegisteredActor = SceneSolver->RegisterObject(this, BodyInstance);
 
             RegisteredInstances.Add(BodyInstance, RegisteredActor);
@@ -60,4 +61,22 @@ void FPhysScene::AddActor(AActor* Actor)
 void FPhysScene::AdvanceAndDispatch_External(float DeltaTime)
 {
     SceneSolver->AdvanceOneTimeStep(this, DeltaTime);
+}
+
+void FPhysScene::SyncBodies()
+{
+    SceneSolver->FetchData(this);
+}
+
+void FPhysScene::SetGravity(FVector InGravity)
+{
+    if (PhysxScene)
+    {
+        PhysxScene->setGravity(PxVec3(InGravity.X, InGravity.Y, InGravity.Z));
+        Gravity = InGravity;
+    }
+    else
+    {
+        UE_LOG(ELogLevel::Error, "PhysxScene is null!");
+    }
 }
