@@ -12,6 +12,7 @@
 #include "Engine/Engine.h"
 #include "Engine/EventManager.h"
 #include "UObject/UObjectIterator.h"
+#include "PhysicsCore/PhysicsScene.h"
 
 class UPrimitiveComponent;
 struct FOverlapResult;
@@ -86,9 +87,14 @@ public:
     double TimeSeconds;
 
 protected:
-    
     FString WorldName = "DefaultWorld";
     
+// Physics 관련
+public:
+    void CreatePhysicsScene();
+private:
+    FPhysScene* PhysicsScene;
+
 private:
     AGameMode* GameMode = nullptr;
 

@@ -5,6 +5,7 @@
 #include "Define.h"
 
 struct FStaticMeshRenderData;
+class UBodySetup;
 
 class UStaticMesh : public UObject
 {
@@ -27,7 +28,11 @@ public:
 
     virtual void SerializeAsset(FArchive& Ar) override;
 
+    void SetBodySetup(UBodySetup* InBodySetup) { BodySetup = InBodySetup; }
+    UBodySetup* GetBodySetup() const { return BodySetup; }
+
 private:
     FStaticMeshRenderData* RenderData = nullptr;
     TArray<FStaticMaterial*> Materials;
+    UBodySetup* BodySetup = nullptr;
 };

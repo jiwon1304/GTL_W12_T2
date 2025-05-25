@@ -1,6 +1,6 @@
 #include "World.h"
 
-#include "CollisionManager.h"
+#include "PhysicsCore/CollisionManager.h"
 #include "Actors/Cube.h"
 #include "Actors/Player.h"
 #include "BaseGizmos/TransformGizmo.h"
@@ -16,6 +16,7 @@
 #include "GameFramework/GameMode.h"
 #include "Classes/Components/TextComponent.h"
 #include "Contents/Actors/Fish.h"
+#include "PhysicsCore/PhysxSolversModule.h"
 
 class UEditorEngine;
 
@@ -35,7 +36,6 @@ void UWorld::InitializeNewWorld()
     ActiveLevel = FObjectFactory::ConstructObject<ULevel>(this);
     ActiveLevel->InitLevel(this);
     //InitializeLightScene(); // 테스트용 LightScene 비활성화
-
     CollisionManager = new FCollisionManager();
 }
 
@@ -188,6 +188,9 @@ void UWorld::BeginPlay()
             }
             });
 
+        CreatePhysicsScene();
+        PhysicsScene->SetGravity(FVector(0, 0, -10));
+
         GameMode->InitGame();
     }
     for (AActor* Actor : ActiveLevel->Actors)
@@ -195,6 +198,7 @@ void UWorld::BeginPlay()
         if (Actor->GetWorld() == this)
         {
             Actor->BeginPlay();
+            PhysicsScene->AddActor(Actor);
         }
     }
 }
@@ -339,5 +343,12 @@ void UWorld::CheckOverlap(const UPrimitiveComponent* Component, TArray<FOverlapR
     {
         CollisionManager->CheckOverlap(this, Component, OutOverlaps);
     }
+}
+
+void UWorld::CreatePhysicsScene()
+{
+    PhysicsScene = new FPhysScene();
+
+    PhysicsScene->Init(FPhysxSolversModule::GetModule()->CreateSolver(), FPhysxSolversModule::GetModule()->CreateScene());
 }
 
