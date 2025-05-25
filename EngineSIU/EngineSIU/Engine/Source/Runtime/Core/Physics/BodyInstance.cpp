@@ -48,7 +48,13 @@ void FBodyInstance::AttachBox(const FKBoxElem* BoxElem)
     }
     PxShape* shape = FPhysXManager::Get().CreateBoxShape(*BoxElem);
     if (shape)
-        ActorHandle->attachShape(*shape);
+    {
+        if (!ActorHandle->attachShape(*shape))
+        {
+            UE_LOG(ELogLevel::Error, "attach box shape failed");
+        }
+
+    }
 }
 
 void FBodyInstance::AttachSphere(const FKSphereElem* SphereElem)

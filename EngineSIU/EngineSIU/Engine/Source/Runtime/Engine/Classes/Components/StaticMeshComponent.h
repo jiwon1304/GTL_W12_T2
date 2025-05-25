@@ -19,6 +19,8 @@ public:
 
     virtual void SetProperties(const TMap<FString, FString>& InProperties) override;
 
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+
     void SetselectedSubMeshIndex(const int& Value) { SelectedSubMeshIndex = Value; }
     int GetselectedSubMeshIndex() const { return SelectedSubMeshIndex; };
 
@@ -38,6 +40,9 @@ public:
 	virtual void ApplyBodySetup(struct FBodyInstance* BodyInstance);
 
 protected:
-    UStaticMesh* StaticMesh = nullptr;
+	UPROPERTY_WITH_FLAGS(
+		EditAnywhere | EditInline,
+		UStaticMesh*, StaticMesh, = nullptr
+	)
     int SelectedSubMeshIndex = -1;
 };

@@ -26,7 +26,7 @@ bool FPhysXManager::Init()
     }
 
     gMaterial = gPhysics->createMaterial(0.5f, 0.5f, 0.6f);
-    gDispatcher = PxDefaultCpuDispatcherCreate(2);
+    gDispatcher = PxDefaultCpuDispatcherCreate(4);
 
     if (!gDispatcher)
     {
@@ -119,6 +119,8 @@ PxShape* FPhysXManager::CreateBoxShape(const FKBoxElem& BoxElem)
 
     PxVec3 halfExtents(BoxElem.X * 0.5f, BoxElem.Y * 0.5f, BoxElem.Z * 0.5f);
     PxShape* shape = gPhysics->createShape(PxBoxGeometry(halfExtents), *gMaterial);
+    PxTransform transform = FPhysicsEngineInterface::GetPhysXTransform(BoxElem.GetTransform());
+    shape->setLocalPose(transform);
 
     return shape;
 }
@@ -131,6 +133,8 @@ PxShape* FPhysXManager::CreateSphereShape(const FKSphereElem& SphereElem)
         return nullptr; // Physics가 초기화되지 않음
     }
     PxShape* shape = gPhysics->createShape(PxSphereGeometry(SphereElem.Radius), *gMaterial);
+    PxTransform transform = FPhysicsEngineInterface::GetPhysXTransform(SphereElem.GetTransform());
+
     return shape;
 }
 
@@ -143,6 +147,7 @@ PxShape* FPhysXManager::CreateSphylShape(const FKSphylElem& SphylElem)
     }
 
     PxShape* shape = gPhysics->createShape(PxCapsuleGeometry(SphylElem.Radius, SphylElem.Length * 0.5f), *gMaterial);
+    PxTransform transform = FPhysicsEngineInterface::GetPhysXTransform(SphylElem.GetTransform());
 
     return shape;
 }
@@ -150,7 +155,7 @@ PxShape* FPhysXManager::CreateSphylShape(const FKSphylElem& SphylElem)
 PxSceneDesc FPhysXManager::GetDefaultSceneDesc()
 {
     PxSceneDesc sceneDesc(gPhysics->getTolerancesScale());
-    sceneDesc.gravity = PxVec3(0, 0, -9.81f);
+    sceneDesc.gravity = PxVec3(0, 0, -98.1f);
     sceneDesc.cpuDispatcher = gDispatcher;
     sceneDesc.flags |= PxSceneFlag::eENABLE_ACTIVE_ACTORS;
     sceneDesc.flags |= PxSceneFlag::eENABLE_CCD;

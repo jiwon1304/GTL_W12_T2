@@ -43,5 +43,8 @@ private:
     FStaticMeshRenderData* RenderData = nullptr;
     TArray<FStaticMaterial*> Materials;
 
-    class UBodySetup* BodySetup = nullptr; // 물리 설정을 위한 BodySetup
+    UPROPERTY_WITH_FLAGS(
+        EditAnywhere | EditInline,
+        class UBodySetup*, BodySetup, = nullptr
+    )
 };

@@ -27,5 +27,4 @@ void ACube::PostInitProperties()
 {
     Super::PostInitProperties();
     StaticMeshComponent->SetStaticMesh(FObjManager::GetStaticMesh(L"Contents/Reference/Reference.obj"));
-    StaticMeshComponent->GetStaticMesh()->GetBodySetup()->AggGeom.AddShape(EAggCollisionShape::Box, RootComponent->GetRelativeTransform());
 }

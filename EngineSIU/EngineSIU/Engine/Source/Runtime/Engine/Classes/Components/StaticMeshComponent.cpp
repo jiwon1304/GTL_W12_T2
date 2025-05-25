@@ -86,6 +86,11 @@ void UStaticMeshComponent::SetProperties(const TMap<FString, FString>& InPropert
     }
 }
 
+void UStaticMeshComponent::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+{
+    SetStaticMesh(StaticMesh);
+}
+
 uint32 UStaticMeshComponent::GetNumMaterials() const
 {
     if (StaticMesh == nullptr) return 0;
@@ -230,7 +235,7 @@ void UStaticMeshComponent::InitBodySetup()
     UBodySetup* BodySetup = StaticMesh->GetBodySetup();
     if (BodySetup == nullptr)
     {
-        BodySetup = FObjectFactory::ConstructObject<UBodySetup>(this);
+        BodySetup = FObjectFactory::ConstructObject<UBodySetup>(this, GetOwner()->GetName());
         StaticMesh->SetBodySetup(BodySetup);
     }
 }
