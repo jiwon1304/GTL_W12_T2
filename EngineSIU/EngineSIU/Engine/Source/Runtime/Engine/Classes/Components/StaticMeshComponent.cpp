@@ -6,6 +6,7 @@
 #include "Launch/EngineLoop.h"
 #include "UObject/Casts.h"
 #include "UObject/ObjectFactory.h"
+#include "Physics/BodySetup.h"
 
 #include "GameFramework/Actor.h"
 
@@ -202,4 +203,55 @@ int UStaticMeshComponent::CheckRayIntersection(const FVector& InRayOrigin, const
 
     }
     return IntersectionNum;
+}
+
+void UStaticMeshComponent::SetStaticMesh(UStaticMesh* Value)
+{
+    StaticMesh = Value;
+    if (StaticMesh == nullptr)
+    {
+        OverrideMaterials.SetNum(0);
+        AABB = FBoundingBox(FVector::ZeroVector, FVector::ZeroVector);
+    }
+    else
+    {
+        OverrideMaterials.SetNum(Value->GetMaterials().Num());
+        AABB = FBoundingBox(StaticMesh->GetRenderData()->BoundingBoxMin, StaticMesh->GetRenderData()->BoundingBoxMax);
+        InitBodySetup();
+    }
+}
+
+void UStaticMeshComponent::InitBodySetup()
+{
+    if (StaticMesh == nullptr)
+    {
+        return;
+    }
+    UBodySetup* BodySetup = StaticMesh->GetBodySetup();
+    if (BodySetup == nullptr)
+    {
+        BodySetup = FObjectFactory::ConstructObject<UBodySetup>(this);
+        StaticMesh->SetBodySetup(BodySetup);
+    }
+}
+
+void UStaticMeshComponent::ApplyBodySetup(FBodyInstance* BodyInstance)
+{
+    if (!StaticMesh->GetBodySetup())
+        return;
+
+    FKAggregateGeom& Geom = StaticMesh->GetBodySetup()->AggGeom;
+    for (const FKBoxElem& BoxElem : Geom.BoxElems)
+    {
+        BodyInstance->AttachBox(&BoxElem);
+    }
+    for (const FKSphereElem& SphereElem : Geom.SphereElems)
+    {
+        BodyInstance->AttachSphere(&SphereElem);
+    }
+    for (const FKSphylElem& SphylElem : Geom.SphylElems)
+    {
+        BodyInstance->AttachSphyl(&SphylElem);
+    }
+    //for (const FKConvexElem& ConvexElem : Geom.ConvexElems)
 }

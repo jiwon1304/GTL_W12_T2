@@ -217,6 +217,8 @@ void USceneComponent::SetWorldLocation(const FVector& InLocation)
     }
     FVector NewRelativeLocation = NewRelativeMatrix.GetTranslationVector();
     RelativeLocation = NewRelativeLocation;
+
+    OnUpdateTransform();
 }
 
 void USceneComponent::SetWorldRotation(const FRotator& InRotation)
@@ -236,6 +238,8 @@ void USceneComponent::SetWorldRotation(const FQuat& InQuat)
     FQuat NewRelativeRotation = FQuat(NewRelativeMatrix);
     RelativeRotation = FRotator(NewRelativeRotation);
     RelativeRotation.Normalize();   
+
+    OnUpdateTransform();
 }
 
 void USceneComponent::SetWorldScale3D(const FVector& InScale)
@@ -412,7 +416,7 @@ bool USceneComponent::MoveComponent(const FVector& Delta, const FRotator& NewRot
 
 void USceneComponent::OnUpdateTransform()
 {
-    UE_LOG(ELogLevel::Warning, TEXT("OnUpdateTransform called for %s"), *GetName());
+    //UE_LOG(ELogLevel::Warning, TEXT("OnUpdateTransform called for %s"), *GetName());
 }
 
 void USceneComponent::UpdateOverlapsImpl(const TArray<FOverlapInfo>* PendingOverlaps, bool bDoNotifies, const TArray<const FOverlapInfo>* OverlapsAtEndLocation)
@@ -449,7 +453,6 @@ bool USceneComponent::MoveComponentImpl(const FVector& Delta, const FQuat& NewRo
         SetWorldRotation(NewRotation);
 
         UpdateOverlaps();
-        OnUpdateTransform();
     }
 
     return true;

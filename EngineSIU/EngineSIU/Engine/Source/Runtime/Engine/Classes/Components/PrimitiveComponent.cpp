@@ -5,6 +5,7 @@
 #include "Engine/OverlapResult.h"
 #include "GameFramework/Actor.h"
 #include "World/World.h"
+#include "Physics/PhysScene.h"
 
 // 언리얼 엔진에서도 여기에서 FOverlapInfo의 생성자를 정의하고 있음.
 FOverlapInfo::FOverlapInfo(UPrimitiveComponent* InComponent, int32 InBodyIndex)
@@ -155,6 +156,8 @@ UObject* UPrimitiveComponent::Duplicate(UObject* InOuter)
     ThisClass* NewComponent = Cast<ThisClass>(Super::Duplicate(InOuter));
 
     NewComponent->AABB = AABB;
+    NewComponent->BodyInstance = BodyInstance;
+    NewComponent->BodyInstance.OwnerComponent = NewComponent;
 
     return NewComponent;
 }
@@ -176,6 +179,15 @@ void UPrimitiveComponent::InitializeComponent()
     //         UE_LOG(ELogLevel::Display, "Component [%s] End overlap with [%s]", *OverlappedComponent->GetName(), *OtherComp->GetName());
     //     }
     // );
+
+    // 월드에 이 컴포넌트 물리 시뮬레이션을 위한 BodyInstance 초기화
+    //UWorld* World = GetWorld();
+    //if (GetWorld() && GetWorld()->GetPhysicsScene())
+    //{
+    //    UWorld* World = GetWorld();
+    //    FPhysScene* PhysScene = World->GetPhysicsScene();
+    //    PhysScene->AddPhysicsObject(this);
+    //}
 }
 
 void UPrimitiveComponent::TickComponent(float DeltaTime)
@@ -502,15 +514,23 @@ void UPrimitiveComponent::OnUpdateTransform()
 void UPrimitiveComponent::SendPhysicsTransform()
 {
     FBodyInstance* UseBI = GetBodyInstance();
-    if (UseBI && UseBI->IsValid())
+    if (UseBI && UseBI->IsValid() && IsSimulatingPhysics())
     {
         UseBI->SetBodyTransform(GetComponentTransform());
         UseBI->UpdateBodyScale(GetComponentTransform().GetScale3D());
     }
     else
     {
-        UE_LOG(ELogLevel::Error, TEXT("SendPhysicsTransform called on a component with Invaid BodyInstance!"));
+        UE_LOG(ELogLevel::Error, TEXT("SendPhysicsTransform called on a component with Invalid BodyInstance!"));
     }
+}
+
+void UPrimitiveComponent::InitBodySetup()
+{
+}
+
+void UPrimitiveComponent::ApplyBodySetup(FBodyInstance* BodyInstance)
+{
 }
 
 const TArray<FOverlapInfo>& UPrimitiveComponent::GetOverlapInfos() const

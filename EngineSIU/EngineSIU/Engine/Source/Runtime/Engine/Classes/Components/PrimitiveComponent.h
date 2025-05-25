@@ -114,6 +114,11 @@ public:
 
     void SendPhysicsTransform();
 
+    virtual void InitBodySetup();
+
+    virtual void ApplyBodySetup(struct FBodyInstance* BodyInstance);
+
+
     /** Returns list of components this component is overlapping. */
     const TArray<FOverlapInfo>& GetOverlapInfos() const;
 

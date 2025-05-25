@@ -1,5 +1,6 @@
 #pragma once
 #include "Math/Transform.h"
+#include "ShapeElem.h"
 
 class FKBoxElem : public FKShapeElem
 {
@@ -68,5 +69,11 @@ class FKBoxElem : public FKShapeElem
     FTransform GetTransform() const
     {
         return FTransform(Rotation, Center);
+    }
+
+    void SetTransform(const FTransform& InTransform)
+    {
+        Rotation = InTransform.Rotator();
+        Center = InTransform.GetTranslation();
     }
 };

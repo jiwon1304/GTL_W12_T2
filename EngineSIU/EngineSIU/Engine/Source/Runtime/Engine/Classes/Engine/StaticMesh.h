@@ -27,7 +27,21 @@ public:
 
     virtual void SerializeAsset(FArchive& Ar) override;
 
+public:
+    /**
+     * StaticMesh의 BodySetup을 반환합니다.
+     * BodySetup은 물리 시뮬레이션을 위한 설정을 포함합니다.
+     */
+    class UBodySetup* GetBodySetup() const { return BodySetup; }
+    /**
+     * StaticMesh의 BodySetup을 설정합니다.
+     * @param InBodySetup 설정할 BodySetup
+     */
+    void SetBodySetup(class UBodySetup* InBodySetup) { BodySetup = InBodySetup; }
+
 private:
     FStaticMeshRenderData* RenderData = nullptr;
     TArray<FStaticMaterial*> Materials;
+
+    class UBodySetup* BodySetup = nullptr; // 물리 설정을 위한 BodySetup
 };

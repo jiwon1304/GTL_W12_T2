@@ -1713,6 +1713,9 @@
     <ClCompile Include="Engine\Source\Runtime\Core\Physics\PhysXManager.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Core\Physics\BodyInstance.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Core\Physics\PhysicsEngineInterface.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Core\Physics\PhysScene.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Core\Physics\BodySetup.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Core\Physics\AggregateGeom.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="EngineSIU.natvis" />

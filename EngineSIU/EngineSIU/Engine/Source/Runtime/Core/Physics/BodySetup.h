@@ -2,7 +2,7 @@
 #include "BodySetupCore.h"
 #include "AggregateGeom.h"
 
-class UBodySetup : UBodySetupCore
+class UBodySetup : public UBodySetupCore
 {
     DECLARE_CLASS(UBodySetup, UObject)
 public:
@@ -13,4 +13,7 @@ public:
         EditAnywhere,
         FKAggregateGeom, AggGeom
     )
+
+public:
+    void Clear();
 };

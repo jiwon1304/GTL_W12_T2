@@ -8,11 +8,10 @@
 #include "Engine/FObjLoader.h"
 
 #include "GameFramework/Actor.h"
-
+#include "Physics/BodySetup.h"
+#include "Physics/AggregateGeom.h"
 ACube::ACube()
 {
-    StaticMeshComponent->SetStaticMesh(FObjManager::GetStaticMesh(L"Contents/Reference/Reference.obj"));
-
     
 }
 
@@ -22,4 +21,11 @@ void ACube::Tick(float DeltaTime)
 
     //SetActorRotation(GetActorRotation() + FRotator(0, 0, 1));
 
+}
+
+void ACube::PostInitProperties()
+{
+    Super::PostInitProperties();
+    StaticMeshComponent->SetStaticMesh(FObjManager::GetStaticMesh(L"Contents/Reference/Reference.obj"));
+    StaticMeshComponent->GetStaticMesh()->GetBodySetup()->AggGeom.AddShape(EAggCollisionShape::Box, RootComponent->GetRelativeTransform());
 }

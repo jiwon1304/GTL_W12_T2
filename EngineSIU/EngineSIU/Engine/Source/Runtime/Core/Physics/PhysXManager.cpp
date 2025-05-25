@@ -3,6 +3,9 @@
 #include "World/World.h"
 #include "Physics/PhysScene.h"
 #include <memory>
+#include "Physics/BoxElem.h"
+#include "Physics/SphereElem.h"
+#include "Physics/SphylElem.h"
 
 bool FPhysXManager::Init()
 {
@@ -83,7 +86,17 @@ FPhysScene* FPhysXManager::CreatePhysScene(UWorld* InWorld)
     return new FPhysScene(NewScene);
 }
 
-FPhysicsActorHandle* FPhysXManager::CreateRigidDynamic(const PxTransform& InTransform)
+void FPhysXManager::ReleasePhysScene(FPhysScene* InPhysScene)
+{
+    if (!InPhysScene)
+    {
+        UE_LOG(ELogLevel::Error, TEXT("ReleasePhysScene failed: InPhysScene is null"));
+        return; // PhysScene이 유효하지 않음
+    }
+    delete InPhysScene; // FPhysScene 객체 삭제
+}
+
+PxRigidDynamic* FPhysXManager::CreateRigidDynamic(const PxTransform& InTransform)
 {
     if (!gPhysics)
     {
@@ -91,14 +104,53 @@ FPhysicsActorHandle* FPhysXManager::CreateRigidDynamic(const PxTransform& InTran
         return nullptr; // Physics가 초기화되지 않음
     }
     PxRigidDynamic* rigidDynamic = gPhysics->createRigidDynamic(InTransform);
+    PxRigidBodyExt::updateMassAndInertia(*rigidDynamic, 10.0f);
 
     return rigidDynamic;
+}
+
+PxShape* FPhysXManager::CreateBoxShape(const FKBoxElem& BoxElem)
+{
+    if (!gPhysics)
+    {
+        UE_LOG(ELogLevel::Error, TEXT("CreateBoxShape failed: gPhysics is null"));
+        return nullptr; // Physics가 초기화되지 않음
+    }
+
+    PxVec3 halfExtents(BoxElem.X * 0.5f, BoxElem.Y * 0.5f, BoxElem.Z * 0.5f);
+    PxShape* shape = gPhysics->createShape(PxBoxGeometry(halfExtents), *gMaterial);
+
+    return shape;
+}
+
+PxShape* FPhysXManager::CreateSphereShape(const FKSphereElem& SphereElem)
+{
+    if (!gPhysics)
+    {
+        UE_LOG(ELogLevel::Error, TEXT("CreateSphereShape failed: gPhysics is null"));
+        return nullptr; // Physics가 초기화되지 않음
+    }
+    PxShape* shape = gPhysics->createShape(PxSphereGeometry(SphereElem.Radius), *gMaterial);
+    return shape;
+}
+
+PxShape* FPhysXManager::CreateSphylShape(const FKSphylElem& SphylElem)
+{
+    if (!gPhysics)
+    {
+        UE_LOG(ELogLevel::Error, TEXT("CreateSphylShape failed: gPhysics is null"));
+        return nullptr; // Physics가 초기화되지 않음
+    }
+
+    PxShape* shape = gPhysics->createShape(PxCapsuleGeometry(SphylElem.Radius, SphylElem.Length * 0.5f), *gMaterial);
+
+    return shape;
 }
 
 PxSceneDesc FPhysXManager::GetDefaultSceneDesc()
 {
     PxSceneDesc sceneDesc(gPhysics->getTolerancesScale());
-    sceneDesc.gravity = PxVec3(0, -9.81f, 0);
+    sceneDesc.gravity = PxVec3(0, 0, -9.81f);
     sceneDesc.cpuDispatcher = gDispatcher;
     sceneDesc.flags |= PxSceneFlag::eENABLE_ACTIVE_ACTORS;
     sceneDesc.flags |= PxSceneFlag::eENABLE_CCD;

@@ -14,7 +14,8 @@
 #include "Components/Light/DirectionalLightComponent.h"
 #include "LevelEditor/SLevelEditor.h"
 #include "Editor/UnrealEd/EditorViewportClient.h"
-
+#include "Physics/PhysScene.h"
+#include "Physics/PhysXManager.h"
 extern FEngineLoop GEngineLoop;
 
 namespace PrivateEditorSelection
@@ -157,6 +158,8 @@ void UEditorEngine::StartPIE()
     PIEWorld->BeginPlay();
     // 여기서 Actor들의 BeginPlay를 해줄지 안에서 해줄 지 고민.
     // WorldList.Add(GetWorldContextFromWorld(PIEWorld));
+    PIEWorld->SetPhysicsScene(FPhysXManager::Get().CreatePhysScene(PIEWorld));
+    PIEWorld->GetPhysicsScene()->StartSimulation();
 }
 
 void UEditorEngine::StartSkeletalMeshViewer(FName SkeletalMeshName, UAnimationAsset* AnimAsset)
@@ -264,6 +267,7 @@ void UEditorEngine::EndPIE()
 {
     if (PIEWorld)
     {
+        PIEWorld->GetPhysicsScene()->StopSimulation();
         this->ClearActorSelection(); // PIE World 기준 Select Actor 해제 
         WorldList.Remove(GetWorldContextFromWorld(PIEWorld));
         PIEWorld->Release();

@@ -14,10 +14,17 @@ struct FKSphereElem : public FKShapeElem
     )
 
     FKSphereElem()
-        : Radius(0.0f)
+        :FKShapeElem(EAggCollisionShape::Sphere)
+        , Radius(1)
         , Center(FVector::ZeroVector)
     {
-        ShapeType = EAggCollisionShape::Sphere;
+    }
+
+    FKSphereElem(float r)
+        :FKShapeElem(EAggCollisionShape::Sphere)
+        , Radius(r)
+        , Center(FVector::ZeroVector)
+    {
     }
 
     void SetRadius(float InRadius)

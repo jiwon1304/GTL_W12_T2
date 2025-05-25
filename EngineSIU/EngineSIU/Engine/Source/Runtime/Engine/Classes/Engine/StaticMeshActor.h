@@ -12,6 +12,7 @@ public:
     AStaticMeshActor();
 
     UStaticMeshComponent* GetStaticMeshComponent() const;
+    virtual void PostInitProperties() override;
 
 protected:
     UPROPERTY(

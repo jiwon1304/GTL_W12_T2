@@ -24,6 +24,24 @@ struct FKSphylElem : public FKShapeElem
         float, Length, = 0.0f
     )
 
+    FKSphylElem()
+        : FKShapeElem(EAggCollisionShape::Sphyl)
+        , Center(FVector::ZeroVector)
+        , Rotation(FRotator::ZeroRotator)
+        , Radius(0.0f)
+        , Length(0.0f)
+    {
+    }
+
+    FKSphylElem(float InRadius, float InLength)
+        : FKShapeElem(EAggCollisionShape::Sphyl)
+        , Center(FVector::ZeroVector)
+        , Rotation(FRotator::ZeroRotator)
+        , Radius(InRadius)
+        , Length(InLength)
+    {
+    }
+
     friend bool operator==(const FKSphylElem& lhs, const FKSphylElem& rhs)
     {
         return lhs.Center == rhs.Center && 

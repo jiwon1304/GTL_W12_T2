@@ -214,8 +214,11 @@ xcopy /y /d "$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\FBX\lib\x64\$
     <ClCompile Include="Engine\Source\Contents\AnimInstance\MyAnimInstance.cpp" />
     <ClCompile Include="Engine\Source\Contents\Components\FishBodyComponent.cpp" />
     <ClCompile Include="Engine\Source\Contents\Components\FishTailComponent.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Core\Physics\AggregateGeom.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Core\Physics\BodyInstance.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Core\Physics\BodySetup.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Core\Physics\PhysicsEngineInterface.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Core\Physics\PhysScene.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Core\Physics\PhysXManager.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Components\ParticleSystemComponent.cpp" />
     <ClCompile Include="Engine\Source\Contents\Objects\DamageCameraShake.cpp" />

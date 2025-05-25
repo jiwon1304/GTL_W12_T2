@@ -2,15 +2,26 @@
 #include "PhysicsInterfaceTypesCore.h"
 #include "PhysicsEngineInterface.h"
 #include "Components/PrimitiveComponent.h"
+#include "Physics/PhysXManager.h"
 
-FPhysicsActorHandle* FBodyInstance::GetPhysicsActorHandle()
+PxRigidActor* FBodyInstance::GetPhysicsActorHandle()
 {
     return ActorHandle;
 }
 
-FPhysicsActorHandle* FBodyInstance::GetPhysicsActorHandle() const
+PxRigidActor* FBodyInstance::GetPhysicsActorHandle() const
 {
     return ActorHandle;
+}
+
+void FBodyInstance::SetPhysicsActorHandle(PxRigidActor* InActorHandle)
+{
+    if (ActorHandle)
+    {
+        UE_LOG(ELogLevel::Warning, TEXT("Setting ActorHandle on FBodyInstance that already has one! Previous handle will be replaced."));
+        ActorHandle->release(); // 기존 핸들을 해제
+    }
+    ActorHandle = InActorHandle;
 }
 
 void FBodyInstance::SetBodyTransform(const FTransform& NewTransform)
@@ -18,6 +29,7 @@ void FBodyInstance::SetBodyTransform(const FTransform& NewTransform)
     if (ActorHandle)
     {
         ActorHandle->setGlobalPose(FPhysicsEngineInterface::GetPhysXTransform(NewTransform));
+        // !TODO : 스케일
     }
 }
 
@@ -25,6 +37,42 @@ void FBodyInstance::UpdateBodyScale(const FVector& NewScale)
 {
     // !TODO : Scale 업데이트 로직
     // Shape들에 대해서 Scale업데이트
+}
+
+void FBodyInstance::AttachBox(const FKBoxElem* BoxElem)
+{
+    if (!ActorHandle)
+    {
+        UE_LOG(ELogLevel::Error, TEXT("AttachBox called on a BodyInstance with no ActorHandle!"));
+        return;
+    }
+    PxShape* shape = FPhysXManager::Get().CreateBoxShape(*BoxElem);
+    if (shape)
+        ActorHandle->attachShape(*shape);
+}
+
+void FBodyInstance::AttachSphere(const FKSphereElem* SphereElem)
+{
+    if (!ActorHandle)
+    {
+        UE_LOG(ELogLevel::Error, TEXT("AttachSphere called on a BodyInstance with no ActorHandle!"));
+        return;
+    }
+    PxShape* shape = FPhysXManager::Get().CreateSphereShape(*SphereElem);
+    if (shape)
+        ActorHandle->attachShape(*shape);
+}
+
+void FBodyInstance::AttachSphyl(const FKSphylElem* SphylElem)
+{
+    if (!ActorHandle)
+    {
+        UE_LOG(ELogLevel::Error, TEXT("AttachSphyl called on a BodyInstance with no ActorHandle!"));
+        return;
+    }
+    PxShape* shape = FPhysXManager::Get().CreateSphylShape(*SphylElem);
+    if (shape)
+        ActorHandle->attachShape(*shape);
 }
 
 bool FBodyInstance::IsInstanceSimulatingPhysics()

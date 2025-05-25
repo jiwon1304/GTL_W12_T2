@@ -24,7 +24,7 @@ struct FKShapeElem
 
     FKShapeElem(EAggCollisionShape::Type InShapeType)
     {
-
+        ShapeType = InShapeType;
     }
 
     UPROPERTY_WITH_FLAGS(

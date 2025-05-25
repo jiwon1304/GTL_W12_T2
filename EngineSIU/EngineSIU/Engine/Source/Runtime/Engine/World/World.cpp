@@ -129,6 +129,11 @@ void UWorld::Tick(float DeltaTime)
         }
         PendingBeginPlayActors.Empty();
     }
+
+    if (PhysicsScene)
+    {
+        PhysicsScene->Tick(DeltaTime);
+    }
 }
 
 void UWorld::BeginPlay()

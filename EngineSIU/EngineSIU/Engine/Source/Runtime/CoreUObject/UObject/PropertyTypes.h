@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include <concepts>
 #include "Container/Array.h"
 #include "Container/Map.h"
@@ -98,7 +98,7 @@ consteval EPropertyType GetPropertyType()
             // 언리얼에서도 커스텀 구조체 포인터에 대해서 지원 안하길래,
             // UI 구현하기 귀찮으니까 그냥 static_assert를 넣었습니다.
             // static_assert 지워도 리플렉션 시스템에 정상 등록은 되지만, UI는 뜨지 않습니다.
-            static_assert(TAlwaysFalse<T>, "Custom struct pointer types are not supported.");
+            // static_assert(TAlwaysFalse<T>, "Custom struct pointer types are not supported.");
             return EPropertyType::StructPointer;
         }
 

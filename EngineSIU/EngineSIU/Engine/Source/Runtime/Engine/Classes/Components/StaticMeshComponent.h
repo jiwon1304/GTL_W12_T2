@@ -3,6 +3,7 @@
 #include "Engine/StaticMesh.h"
 
 #include "Engine/Asset/StaticMeshAsset.h"
+#include "Physics/BodySetup.h"
 
 class UStaticMeshComponent : public UMeshComponent
 {
@@ -30,20 +31,11 @@ public:
     virtual int CheckRayIntersection(const FVector& InRayOrigin, const FVector& InRayDirection, float& OutHitDistance) const override;
     
     UStaticMesh* GetStaticMesh() const { return StaticMesh; }
-    void SetStaticMesh(UStaticMesh* Value)
-    { 
-        StaticMesh = Value;
-        if (StaticMesh == nullptr)
-        {
-            OverrideMaterials.SetNum(0);
-            AABB = FBoundingBox(FVector::ZeroVector, FVector::ZeroVector);
-        }
-        else
-        {
-            OverrideMaterials.SetNum(Value->GetMaterials().Num());
-            AABB = FBoundingBox(StaticMesh->GetRenderData()->BoundingBoxMin, StaticMesh->GetRenderData()->BoundingBoxMax);
-        }
-    }
+    void SetStaticMesh(UStaticMesh* Value);
+
+    // StaticMesh의 BodySetup을 초기화합니다. 이미 존재한다면 Clear하고 사용
+    virtual void InitBodySetup() override;
+	virtual void ApplyBodySetup(struct FBodyInstance* BodyInstance);
 
 protected:
     UStaticMesh* StaticMesh = nullptr;

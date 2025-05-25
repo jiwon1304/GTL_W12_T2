@@ -10,6 +10,8 @@ public:
     ACube();
 
     virtual void Tick(float DeltaTime) override;
+    virtual void PostInitProperties() override;
+    
 
     
 
