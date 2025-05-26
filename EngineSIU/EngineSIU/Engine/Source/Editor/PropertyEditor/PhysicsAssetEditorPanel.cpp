@@ -16,7 +16,6 @@ FPhysicsAssetEditorPanel::FPhysicsAssetEditorPanel()
 
 void FPhysicsAssetEditorPanel::Render()
 {
-    // TODO UISOO Implement (늦어도 ㄱㅊ)
     UEditorEngine* EditorEngine = Cast<UEditorEngine>(GEngine);
     if (!EditorEngine)
     {
@@ -57,7 +56,7 @@ void FPhysicsAssetEditorPanel::Render()
 
     // Draw
 
-    RenderAddShapeButton();
+    RenderAddPrimitiveButton();
     ImGui::SameLine();
     RenderPhysicsAssetFilter();
 
@@ -108,7 +107,7 @@ void FPhysicsAssetEditorPanel::OnResize(HWND hWnd)
     }
 }
 
-void FPhysicsAssetEditorPanel::RenderAddShapeButton()
+void FPhysicsAssetEditorPanel::RenderAddPrimitiveButton()
 {
     const ImGuiIO& IO = ImGui::GetIO();
     ImFont* IconFont = IO.Fonts->Fonts[FEATHER_FONT];
@@ -136,92 +135,130 @@ void FPhysicsAssetEditorPanel::RenderAddShapeButton()
             {.Label = "Capsule", .ShapeType = EAggCollisionShape::Sphyl },
         };
 
-        // for (const auto& Shape : Shapes)
-        // {
-        //     if (ImGui::Selectable(Shape.Label))
-        //     {
-        //         UEditorEngine* EditorEngine = Cast<UEditorEngine>(GEngine);
-        //         if (!EditorEngine)
-        //         {
-        //             return;
-        //         }
-        //
-        //         int32 SelectedBoneIndex = EditorEngine->PhysicsAssetEditorWorld->SelectBoneIndex;
-        //         int32 SelectedBodySetupIndex = EditorEngine->PhysicsAssetEditorWorld->SelectedBodySetupIndex;
-        //
-        //         int32 ParentBodySetupIndex = EditorEngine->PhysicsAssetEditorWorld->SelectedShape.ParentBodySetupIndex;
-        //         int32 SelectedShapeIndex = EditorEngine->PhysicsAssetEditorWorld->SelectedShape.SelectedShapeIndex;
-        //         EAggCollisionShape::Type ShapeType = EditorEngine->PhysicsAssetEditorWorld->SelectedShape.ShapeType;
-        //
-        //         if (SelectedBoneIndex == -1 && SelectedBodySetupIndex == -1 && (SelectedShapeIndex == -1 || ParentBodySetupIndex == -1))
-        //         {
-        //             return;
-        //         }
-        //
-        //         USkeletalMesh* SkeletalMesh = EditorEngine->PhysicsAssetEditorWorld->GetSkeletalMeshComponent()->GetSkeletalMeshAsset();
-        //         UPhysicsAsset* PhysicsAsset = SkeletalMesh->GetPhysicsAsset();
-        //         UBodySetup* SelectedBodySetup = PhysicsAsset->BodySetup[SelectedBodySetupIndex];
-        //         const FMeshBoneInfo& SelectedBoneInfo = SkeletalMesh->GetSkeleton()->GetReferenceSkeleton().GetRawRefBoneInfo()[SelectedBoneIndex];
-        //         const FTransform& SelectedBonePose = SkeletalMesh->GetSkeleton()->GetReferenceSkeleton().GetRawRefBonePose()[SelectedBoneIndex];
-        //
-        //         UBodySetup* ParentBodySetup = PhysicsAsset->BodySetup[SelectedBodySetupIndex];
-        //         FKShapeElem ShapeElem;
-        //         if (ShapeType == EAggCollisionShape::Box)
-        //         {
-        //             ShapeElem = ParentBodySetup->AggGeom.BoxElems[SelectedShapeIndex];
-        //         }
-        //         else if (ShapeType == EAggCollisionShape::Sphere)
-        //         {
-        //             ShapeElem = ParentBodySetup->AggGeom.SphereElems[SelectedShapeIndex];
-        //
-        //         }
-        //         
-        //         if (SelectedBone == nullptr && SelectedBodySetup == nullptr && SelectedShape == nullptr)
-        //         {
-        //             continue;
-        //         }
-        //         UWorld* World = GEngine->ActiveWorld;
-        //         AActor* SpawnedActor = nullptr;
-        //         switch (Shape.ShapeType)
-        //         {
-        //         case EAggCollisionShape::Sphere:
-        //         {
-        //             FKSphereElem SphereElem = FKSphereElem();
-        //             SelectedBodySetup->AggGeom.SphereElems.Add(SphereElem);
-        //             SphereElem.Center = FVector::ZeroVector;
-        //             SphereElem.Radius = DefaultPrimSize;
-        //             break;
-        //         }
-        //         case EAggCollisionShape::Box:
-        //         {
-        //             FKBoxElem BoxElem = FKBoxElem();
-        //             SelectedBodySetup->AggGeom.BoxElems.Add(BoxElem);
-        //             BoxElem.SetTransform( FTransform::Identity );
-        //
-        //             BoxElem.X = 0.5f * DefaultPrimSize;
-        //             BoxElem.Y = 0.5f * DefaultPrimSize;
-        //             BoxElem.Z = 0.5f * DefaultPrimSize;
-        //             break;
-        //         }
-        //         case EAggCollisionShape::Sphyl:
-        //         {
-        //             FKSphylElem SphylElem = FKSphylElem();
-        //             SelectedBodySetup->AggGeom.SphylElems.Add(SphylElem);
-        //
-        //             SphylElem.SetTransform( FTransform::Identity );
-        //
-        //             SphylElem.Length = DefaultPrimSize;
-        //             SphylElem.Radius = DefaultPrimSize;
-        //             
-        //             break;
-        //         }
-        //         default:
-        //             break;
-        //         }
-        //
-        //         ClearSelectedBody();
-        //     }
-        // }
+        for (const auto& Shape : Shapes)
+        {
+            if (ImGui::Selectable(Shape.Label))
+            {
+                UEditorEngine* EditorEngine = Cast<UEditorEngine>(GEngine);
+                if (!EditorEngine)
+                {
+                    continue;
+                }
+        
+                int32 SelectedBoneIndex = EditorEngine->PhysicsAssetEditorWorld->SelectBoneIndex;
+                int32 SelectedBodySetupIndex = EditorEngine->PhysicsAssetEditorWorld->SelectedBodySetupIndex;
+        
+                int32 ParentBodySetupIndex = EditorEngine->PhysicsAssetEditorWorld->SelectedPrimitive.ParentBodySetupIndex;
+                int32 SelectedPrimitiveIndex = EditorEngine->PhysicsAssetEditorWorld->SelectedPrimitive.SelectedPrimitiveIndex;
+                EAggCollisionShape::Type ShapeType = EditorEngine->PhysicsAssetEditorWorld->SelectedPrimitive.PrimitiveType;
+        
+                if (SelectedBoneIndex == -1 && SelectedBodySetupIndex == -1 && (SelectedPrimitiveIndex == -1 || ParentBodySetupIndex == -1))
+                {
+                    continue;
+                }
+        
+                USkeletalMesh* SkeletalMesh = EditorEngine->PhysicsAssetEditorWorld->GetSkeletalMeshComponent()->GetSkeletalMeshAsset();
+                UPhysicsAsset* PhysicsAsset = SkeletalMesh->GetPhysicsAsset();
+                
+                UBodySetup* SelectedBodySetup = SelectedBodySetupIndex == -1 ? nullptr : PhysicsAsset->BodySetup[SelectedBodySetupIndex];
+                bool isBoneValid = SelectedBoneIndex == -1 ? false : SkeletalMesh->GetSkeleton()->GetReferenceSkeleton().IsValidRawIndex(SelectedBoneIndex);
+                UBodySetup* ParentBodySetup = ParentBodySetupIndex == -1 ? nullptr : PhysicsAsset->BodySetup[ParentBodySetupIndex];
+                
+                bool isPrimitiveExist = false;
+                if (ShapeType == EAggCollisionShape::Box)
+                {
+                    if (SelectedPrimitiveIndex >= 0 && SelectedPrimitiveIndex < ParentBodySetup->AggGeom.BoxElems.Num())
+                    {
+                        isPrimitiveExist = true;
+                    }
+                }
+                else if (ShapeType == EAggCollisionShape::Sphere)
+                {
+                    if (SelectedPrimitiveIndex >= 0 && SelectedPrimitiveIndex < ParentBodySetup->AggGeom.SphereElems.Num())
+                    {
+                        isPrimitiveExist = true;
+                    }
+                }
+                else if (ShapeType == EAggCollisionShape::Sphyl)
+                {
+                    if (SelectedPrimitiveIndex >= 0 && SelectedPrimitiveIndex < ParentBodySetup->AggGeom.SphylElems.Num())
+                    {
+                        isPrimitiveExist = true;
+                    }
+                }
+
+                if (!isPrimitiveExist)
+                {
+                    ParentBodySetup = nullptr;
+                }
+                
+                if (isBoneValid == false && SelectedBodySetup == nullptr && ParentBodySetup == nullptr)
+                {
+                    continue;
+                }
+
+                UBodySetup* TargetBodySetup = nullptr;
+
+                if (isBoneValid)
+                {
+                    FName BoneName = SkeletalMesh->GetSkeleton()->GetReferenceSkeleton().GetBoneName(SelectedBoneIndex);
+                    int32 BodyIndex = PhysicsAsset->FindBodyIndex(BoneName);
+                    TargetBodySetup = PhysicsAsset->BodySetup[BodyIndex];
+                }
+                else if (SelectedBodySetup != nullptr)
+                {
+                    TargetBodySetup = SelectedBodySetup;
+                }
+                else if (ParentBodySetup != nullptr)
+                {
+                    TargetBodySetup = ParentBodySetup;
+                }
+                
+                switch (Shape.ShapeType)
+                {
+                case EAggCollisionShape::Sphere:
+                {
+                    FKSphereElem SphereElem = FKSphereElem();
+                    TargetBodySetup->AggGeom.SphereElems.Add(SphereElem);
+                    SphereElem.Center = FVector::ZeroVector;
+                    SphereElem.Radius = DefaultPrimSize;
+                    break;
+                }
+                case EAggCollisionShape::Box:
+                {
+                    FKBoxElem BoxElem = FKBoxElem();
+                    TargetBodySetup->AggGeom.BoxElems.Add(BoxElem);
+                    BoxElem.SetTransform( FTransform::Identity );
+        
+                    BoxElem.X = 0.5f * DefaultPrimSize;
+                    BoxElem.Y = 0.5f * DefaultPrimSize;
+                    BoxElem.Z = 0.5f * DefaultPrimSize;
+                    break;
+                }
+                case EAggCollisionShape::Sphyl:
+                {
+                    FKSphylElem SphylElem = FKSphylElem();
+                    TargetBodySetup->AggGeom.SphylElems.Add(SphylElem);
+        
+                    SphylElem.SetTransform( FTransform::Identity );
+        
+                    SphylElem.Length = DefaultPrimSize;
+                    SphylElem.Radius = DefaultPrimSize;
+                    
+                    break;
+                }
+                case EAggCollisionShape::Convex:
+                case EAggCollisionShape::TaperedCapsule:
+                case EAggCollisionShape::LevelSet:
+                case EAggCollisionShape::SkinnedLevelSet:
+                case EAggCollisionShape::Unknown:
+                default:
+                    break;
+                }
+        
+                EditorEngine->PhysicsAssetEditorWorld->ClearSelected();
+            }
+        }
         ImGui::EndPopup();
     }
 }

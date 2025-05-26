@@ -3,12 +3,14 @@
 #include "PhysicsEngine/ShapeElem.h"
 
 
-struct FSelectedShape
+struct FSelectedPrimitive
 {
     int32 ParentBodySetupIndex = -1;
-    int32 SelectedShapeIndex = -1;
+    int32 SelectedPrimitiveIndex = -1;
 
-    EAggCollisionShape::Type ShapeType = EAggCollisionShape::Unknown;
+    EAggCollisionShape::Type PrimitiveType = EAggCollisionShape::Unknown;
+
+    FSelectedPrimitive() : ParentBodySetupIndex(-1), SelectedPrimitiveIndex(-1), PrimitiveType(EAggCollisionShape::Unknown) {}
 };
 
 class UPhysicsAssetWorld : public UWorld
@@ -30,10 +32,12 @@ public:
         return SkeletalMeshComponent;
     }
 
+    void ClearSelected();
+
     // Index가 도중에 변화한 경우 이를 보장하지 않음. (보장하기 위해선 Index가 아닌 FName으로 저장 후 IndexMapping을 이용해야 됨)
     int32 SelectBoneIndex = -1;
     int32 SelectedBodySetupIndex = -1;
-    FSelectedShape SelectedShape;
+    FSelectedPrimitive SelectedPrimitive;
 
 private:
     USkeletalMeshComponent* SkeletalMeshComponent = nullptr;
