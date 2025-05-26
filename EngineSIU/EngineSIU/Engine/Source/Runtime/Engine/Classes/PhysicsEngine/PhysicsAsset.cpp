@@ -1,4 +1,4 @@
-﻿#include "PhysicsAsset.h"
+#include "PhysicsAsset.h"
 
 int32 UPhysicsAsset::FindBodyIndex(const FName& BoneName) const
 {
@@ -9,4 +9,10 @@ int32 UPhysicsAsset::FindBodyIndex(const FName& BoneName) const
     }
 
     return INDEX_NONE;
+}
+
+FName UPhysicsAsset::FindConstraintBoneName(int32 BoneIndex) const
+{
+    // !TODO : 미구현
+    return FName();
 }
