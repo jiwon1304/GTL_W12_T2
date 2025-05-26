@@ -20,7 +20,7 @@ class IRenderPass;
 class FSkeletalMeshRenderPass;
 class FLightHeatMapRenderPass;
 class FPostProcessCompositingPass;
-enum class EResourceType : uint8;
+enum class EResourceType : uint16;
 
 class FSceneRenderPass;
 class UWorld;
@@ -40,6 +40,7 @@ class FDepthBufferDebugPass;
 class FWorldNormalDebugPass;
 class FLineRenderPass;
 class FFogRenderPass;
+class FBlurRenderPass;
 class FCameraEffectRenderPass;
 class FCompositingPass;
 class FSlateRenderPass;
@@ -107,6 +108,7 @@ public:
     FUpdateLightBufferPass* UpdateLightBufferPass = nullptr;
     FLineRenderPass* LineRenderPass = nullptr;
     FFogRenderPass* FogRenderPass = nullptr;
+    FBlurRenderPass* BlurRenderPass = nullptr;
     FCameraEffectRenderPass* CameraEffectRenderPass = nullptr;
     FEditorRenderPass* EditorRenderPass = nullptr;
     
