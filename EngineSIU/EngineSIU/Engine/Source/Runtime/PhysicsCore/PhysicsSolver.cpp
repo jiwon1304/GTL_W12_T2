@@ -161,13 +161,15 @@ PxActor* FPhysicsSolver::RegisterObject(FPhysScene* InScene, const FBodyInstance
         // Dynamic Actor의 경우, PhysMaterial이 설정되어 있어야 함
         if (!NewInstance->ExternalCollisionProfileBodySetup->PhysMaterial)
         {
-            UE_LOG(ELogLevel::Warning, TEXT("Dynamic Actor must have a PhysMaterial. Setting MassScale and Density to 1"));
-            return nullptr;
+            UE_LOG(ELogLevel::Warning, TEXT("Dynamic Actor must have a PhysMaterial. Setting Density to 1"));
+            physx::PxRigidBodyExt::updateMassAndInertia(*RigidDynamic, 1);
         }
-        float Mass = NewInstance->MassScale 
-            * NewInstance->ExternalCollisionProfileBodySetup->PhysMaterial->Density * Volume;
-        physx::PxRigidBodyExt::updateMassAndInertia(*RigidDynamic, NewInstance->MassScale);
-
+        else
+        {
+            float DensityScaled = NewInstance->MassScale
+                * NewInstance->ExternalCollisionProfileBodySetup->PhysMaterial->Density;
+            physx::PxRigidBodyExt::updateMassAndInertia(*RigidDynamic, DensityScaled);
+        }
     }
     Scene->addActor(*NewRigidActor);
 
