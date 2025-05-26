@@ -7,6 +7,9 @@
 #include "Physics/SphereElem.h"
 #include "Physics/SphylElem.h"
 
+#pragma comment(lib, "PhysXPvdSDK_static_64.lib")
+
+
 bool FPhysXManager::Init()
 {
     gFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, gAllocator, gErrorCallback);
@@ -17,7 +20,15 @@ bool FPhysXManager::Init()
         return false; // Foundation 생성 실패
     }
 
-    gPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *gFoundation, PxTolerancesScale());
+    gPvd = PxCreatePvd(*gFoundation);
+    gTransport = PxDefaultPvdSocketTransportCreate("127.0.0.1", 5425, 10);
+#if _DEBUG
+    gPvd->connect(*gTransport, PxPvdInstrumentationFlag::eALL);
+#else
+    gPvd->connect(*gTransport, PxPvdInstrumentationFlag::eNone);
+#endif
+
+    gPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *gFoundation, PxTolerancesScale(), true, gPvd);
 
     if (!gPhysics)
     {
@@ -33,6 +44,7 @@ bool FPhysXManager::Init()
         UE_LOG(ELogLevel::Error, TEXT("PxDefaultCpuDispatcherCreate failed"));
         return false; // Dispatcher 생성 실패
     }
+
 
     return true;
 }
@@ -160,6 +172,10 @@ PxSceneDesc FPhysXManager::GetDefaultSceneDesc()
     sceneDesc.flags |= PxSceneFlag::eENABLE_ACTIVE_ACTORS;
     sceneDesc.flags |= PxSceneFlag::eENABLE_CCD;
     sceneDesc.flags |= PxSceneFlag::eENABLE_PCM;
+#if _DEBUG
+    sceneDesc.flags |= PxSceneFlag::eENABLE_ENHANCED_DETERMINISM;
+#endif // _DEBUG
+
 
     sceneDesc.filterShader = PxDefaultSimulationFilterShader;
 

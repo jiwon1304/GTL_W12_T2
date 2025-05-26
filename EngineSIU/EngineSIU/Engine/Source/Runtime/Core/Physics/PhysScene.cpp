@@ -29,13 +29,7 @@ FPhysScene::~FPhysScene()
         Scene->release();
         Scene = nullptr;
     }
-    for (FBodyInstance* Body : PhysicsObjects)
-    {
-        if (Body)
-        {
-            delete Body;
-        }
-    }
+
     PhysicsObjects.Empty();
     OwningWorld = nullptr;
 }

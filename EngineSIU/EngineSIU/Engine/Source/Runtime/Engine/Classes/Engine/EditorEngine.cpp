@@ -268,6 +268,7 @@ void UEditorEngine::EndPIE()
     if (PIEWorld)
     {
         PIEWorld->GetPhysicsScene()->StopSimulation();
+        FPhysXManager::Get().ReleasePhysScene(PIEWorld->GetPhysicsScene());
         this->ClearActorSelection(); // PIE World 기준 Select Actor 해제 
         WorldList.Remove(GetWorldContextFromWorld(PIEWorld));
         PIEWorld->Release();

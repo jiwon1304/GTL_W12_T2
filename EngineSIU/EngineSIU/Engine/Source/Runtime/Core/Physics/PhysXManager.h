@@ -39,4 +39,6 @@ private:
     PxDefaultErrorCallback      gErrorCallback;
     PxDefaultCpuDispatcher*     gDispatcher;
     PxMaterial*                 gMaterial;              // 피직스 머티리얼은 일단 싱글톤에서 하나로 관리함
+    PxPvd*                      gPvd;                   // 디버깅을 위한 pvd
+    PxPvdTransport*             gTransport;
 };
