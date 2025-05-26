@@ -27,12 +27,14 @@ class UPhysicsConstraintTemplate : public UObject
 public:
     UPhysicsConstraintTemplate() = default;
 
+    // Bone의 위치정보
     UPROPERTY(
         EditAnywhere,
         FConstraintInstance, 
         DefaultInstance,
     )
 
+    // Bone 사이의 constraint 정보
     UPROPERTY(
         TArray<FPhysicsConstraintProfileHandle>,
         ProfileHandles

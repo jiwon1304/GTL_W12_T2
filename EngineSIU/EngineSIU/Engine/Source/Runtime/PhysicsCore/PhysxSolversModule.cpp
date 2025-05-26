@@ -83,6 +83,14 @@ PxScene* FPhysxSolversModule::CreateScene()
     Dispatcher = PxDefaultCpuDispatcherCreate(PX_NUM_DISPATCHER);
     sceneDesc.cpuDispatcher = Dispatcher;
     sceneDesc.filterShader = PxDefaultSimulationFilterShader;
+
+    sceneDesc.flags |= PxSceneFlag::eENABLE_ACTIVE_ACTORS;
+    sceneDesc.flags |= PxSceneFlag::eENABLE_CCD;
+    sceneDesc.flags |= PxSceneFlag::eENABLE_PCM;
+#if _DEBUG
+    sceneDesc.flags |= PxSceneFlag::eENABLE_ENHANCED_DETERMINISM;
+#endif // _DEBUG
+
     PxScene* Scene = Physics->createScene(sceneDesc);
     //Scene->setVisualizationParameter(PxVisualizationParameter::eSCALE, 1.0f); // PVD용
     //Scene->setVisualizationParameter(PxVisualizationParameter::eACTOR_AXES, 1.0f); // PVD용

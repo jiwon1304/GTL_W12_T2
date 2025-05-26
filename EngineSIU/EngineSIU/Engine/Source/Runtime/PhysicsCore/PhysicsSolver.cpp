@@ -178,11 +178,13 @@ PxActor* FPhysicsSolver::RegisterObject(FPhysScene* InScene, const FBodyInstance
 
 void FPhysicsSolver::AdvanceOneTimeStep(FPhysScene* InScene, float Dt)
 {
+    //PxSceneWriteLock scopedWriteLock(*InScene->PhysxScene);
     InScene->PhysxScene->simulate(Dt);
 }
 
 void FPhysicsSolver::FetchData(FPhysScene* InScene)
 {
+    //PxSceneReadLock scopedReadLock(*InScene->PhysxScene);
     InScene->PhysxScene->fetchResults(true);
 
     PxScene* Scene = InScene->PhysxScene;
