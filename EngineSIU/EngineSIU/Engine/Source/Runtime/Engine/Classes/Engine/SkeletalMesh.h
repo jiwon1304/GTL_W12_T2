@@ -1,5 +1,6 @@
 #pragma once
 #include "SkinnedAsset.h"
+#include "Animation/Skeleton.h"
 #include "Asset/SkeletalMeshAsset.h" 
 class UPhysicsAsset;
 class USkeleton;
@@ -32,6 +33,15 @@ public:
     {
         PhysicsAsset = InPhysicsAsset;
     }
+    const FReferenceSkeleton* GetRefSkeleton()
+    {
+        if (Skeleton)
+        {
+            return &Skeleton->GetReferenceSkeleton();
+        }
+        return nullptr;
+    }
+
     
 protected:
     std::unique_ptr<FSkeletalMeshRenderData> RenderData;
