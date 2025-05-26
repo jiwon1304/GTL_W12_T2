@@ -120,7 +120,7 @@ void FBlurRenderPass::Render(const std::shared_ptr<FEditorViewportClient>& Viewp
     BufferManager->UpdateConstantBuffer("DOFConstantBuffer", DOFParams);
 
     // RTV 설정
-    const EResourceType ResourceType = EResourceType::ERT_PP_Blur0;
+    const EResourceType ResourceType = EResourceType::ERT_PP_Blur;
     FRenderTargetRHI* RenderTargetRHI = ViewportResource->GetRenderTarget(ResourceType);
     Graphics->DeviceContext->OMSetRenderTargets(1, &RenderTargetRHI->RTV, nullptr);
 

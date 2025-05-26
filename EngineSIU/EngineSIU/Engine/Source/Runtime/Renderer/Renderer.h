@@ -20,7 +20,7 @@ class IRenderPass;
 class FSkeletalMeshRenderPass;
 class FLightHeatMapRenderPass;
 class FPostProcessCompositingPass;
-enum class EResourceType : uint16;
+enum class EResourceType : uint8;
 
 class FSceneRenderPass;
 class UWorld;

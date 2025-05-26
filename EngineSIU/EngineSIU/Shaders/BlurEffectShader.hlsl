@@ -1,3 +1,5 @@
+#include "ShaderRegisters.hlsl"
+
 Texture2D SceneDepthTexture : register(t99);
 Texture2D SceneTexture : register(t100);
 SamplerState SceneSampler : register(s0);
@@ -17,14 +19,30 @@ struct VS_OUTPUT
     float2 UV : TEXCOORD0;
 };
 
+float3 ReconstructWorldPos(float2 UV, float Depth)
+{
+    float4 NDC;
+    NDC.xy = UV * 2.0 - 1.0; // [0,1] → [-1,1]
+    NDC.y *= -1;
+    NDC.z = Depth;
+    NDC.w = 1.0;
+
+    float4 ViewPos = mul(NDC, InvProjectionMatrix);
+    ViewPos /= ViewPos.w;
+
+    return ViewPos.xyz;
+}
+
 // Depth 텍스처가 있고, 해당 픽셀의 depth 값을 구하는 함수가 있다고 가정
 float GetSceneDepth(float2 uv)
 {
     // 여기서 DSV는 R24G8
-    return SceneDepthTexture.Sample(SceneSampler, uv).r;
+    float NDCDepth = SceneDepthTexture.Sample(SceneSampler, uv).r;
+    return ReconstructWorldPos(uv, NDCDepth).z;
 }
 
-float GetFocusFactor(float centerDepth, float FocalDistance, float FocalRegion)
+// focus 영역으로부터 멀면 1.0, focus 영역이면 0을 리턴하는 함수
+float GetFocusFactor(float centerDepth, float FocalDistance, float FocalRegion, float Multiplier)
 {
     // 포커스 영역: [FocalDistance, FocalDistance + FocalRegion]
     if (centerDepth >= FocalDistance && centerDepth <= FocalDistance + FocalRegion)
@@ -34,58 +52,45 @@ float GetFocusFactor(float centerDepth, float FocalDistance, float FocalRegion)
     else if (centerDepth < FocalDistance)
     {
         // 포커스 영역보다 카메라 쪽이면, 포커스 영역과의 거리만큼 blur 증가
-        return saturate((FocalDistance - centerDepth) / FocalRegion);
+        return saturate((FocalDistance - centerDepth) / FocalRegion * Multiplier);
     }
     else // centerDepth > FocalDistance + FocalRegion
     {
         // 포커스 영역보다 멀면, 포커스 영역과의 거리만큼 blur 증가
-        return saturate((centerDepth - (FocalDistance + FocalRegion)) / FocalRegion);
+        return saturate((centerDepth - (FocalDistance + FocalRegion)) / FocalRegion * Multiplier);
     }
 }
 
 float4 mainPS(VS_OUTPUT input) : SV_Target
 {
-    float2 uv = input.UV;
-    // 현재 픽셀의 뎁스(가정: 0~1 range)
-    float centerDepth = GetSceneDepth(uv);
-
-    float focusFactor = GetFocusFactor(centerDepth, FocalDistance, FocalRegion);
-    float blurStrength = focusFactor * BlurAmount;
-    float radius = lerp(0, BlurRadius, blurStrength);
-    blurStrength = saturate(blurStrength);
+    // blur된 값 구하기
+    int k = int(BlurRadius);
     
-    radius = 10;
-    blurStrength = 0.5;
+    float3 FinalColor = float3(0, 0, 0);
+    float2 uv = input.UV;
 
-    // 간단한 원형 블러 샘플링
-    float3 colorSum = 0;
-    float weightSum = 0;
-    const int sampleCount = 12;
-    for (int i = 0; i < sampleCount; ++i)
+    for (int i = -k; i <= k; ++i)
     {
-        float angle = 2 * 3.141592 * (i / (float) sampleCount);
-        float2 offset = float2(cos(angle), sin(angle)) * radius;
-        float2 sampleUV = uv + offset;
-        float3 sampleColor = SceneTexture.Sample(SceneSampler, sampleUV).rgb;
-
-        // 간단히 가중치 1, 실제로는 가우시안 등 가중치 적용 가능
-        colorSum += sampleColor;
-        weightSum += 1.0;
+        for (int j = -k; j <= k; ++j)
+        {
+            float2 uvAdj = uv + float2(i, j) / 1080.0;
+            float3 Color = SceneTexture.Sample(SceneSampler, uvAdj).rgb;
+            FinalColor += Color;
+        }
     }
+    FinalColor /= (2 * k + 1) * (2 * k + 1);
 
-    float3 blurredColor = colorSum / weightSum;
-    // 포커스 강도에 따라 원본/블러드 색 혼합
-    float3 originalColor = SceneTexture.Sample(SceneSampler, uv).rgb;
-    float3 finalColor = lerp(originalColor, blurredColor, blurStrength);
-
-    return float4(finalColor, 1.0);
+    // 현재 픽셀의 깊이를 통해서 블러 정도를 계산
+    float CenterDepth = GetSceneDepth(uv);
+    
+    float FocusFactor = GetFocusFactor(CenterDepth, FocalDistance, FocalRegion, BlurAmount);
+    
+    return float4(FinalColor, FocusFactor);
 }
 
-
-
-
-
-VS_OUTPUT mainVS(uint vertexId : SV_VertexID)
+VS_OUTPUT
+    mainVS(
+    uint vertexId : SV_VertexID)
 {
     VS_OUTPUT output;
 

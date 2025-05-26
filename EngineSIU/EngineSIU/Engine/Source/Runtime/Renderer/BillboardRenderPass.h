@@ -6,7 +6,7 @@
 
 #include "Define.h"
 
-enum class EResourceType : uint16;
+enum class EResourceType : uint8;
 class UBillboardComponent;
 class FDXDBufferManager;
 class FGraphicsDevice;
