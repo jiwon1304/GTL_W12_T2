@@ -124,7 +124,7 @@ void FPhysScene::StartSimulation()
             FMatrix ComponentWorldMatrix = Body->OwnerComponent->GetWorldMatrix();
             FTransform ComponentWorldTransform = FTransform(ComponentWorldMatrix);
             
-            Body->SetPhysicsActorHandle(FPhysXManager::Get().CreateRigidDynamic(FPhysicsEngineInterface::GetPhysXTransform(ComponentWorldTransform)));
+            Body->SetPhysicsActorHandle(FPhysXManager::Get().CreateRigidDynamic(FPhysicsEngineInterface::GetPhysXTransform(ComponentWorldTransform), Body->bIsKinematic));
             Scene->addActor(*Body->ActorHandle);
             Body->OwnerComponent->ApplyBodySetup(Body);
         }

@@ -19,6 +19,11 @@ struct FBodyInstance
         bool, bSimulatePhysics, = false
     )
 
+    UPROPERTY_WITH_FLAGS(
+        EditAnywhere,
+        bool, bIsKinematic, = false
+    )
+
     PxRigidActor* ActorHandle = nullptr;
     PxRigidActor* GetPhysicsActorHandle();
     PxRigidActor* GetPhysicsActorHandle() const;

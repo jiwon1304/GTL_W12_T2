@@ -108,7 +108,7 @@ void FPhysXManager::ReleasePhysScene(FPhysScene* InPhysScene)
     delete InPhysScene; // FPhysScene 객체 삭제
 }
 
-PxRigidDynamic* FPhysXManager::CreateRigidDynamic(const PxTransform& InTransform)
+physx::PxRigidDynamic* FPhysXManager::CreateRigidDynamic(const PxTransform& InTransform, bool bIsKinematic)
 {
     if (!gPhysics)
     {
@@ -117,6 +117,8 @@ PxRigidDynamic* FPhysXManager::CreateRigidDynamic(const PxTransform& InTransform
     }
     PxRigidDynamic* rigidDynamic = gPhysics->createRigidDynamic(InTransform);
     PxRigidBodyExt::updateMassAndInertia(*rigidDynamic, 10.0f);
+
+    rigidDynamic->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, bIsKinematic);
 
     return rigidDynamic;
 }

@@ -21,7 +21,8 @@ public:
 public:
     FPhysScene* CreatePhysScene(class UWorld* InWorld);
     void ReleasePhysScene(FPhysScene* InPhysScene);
-    PxRigidDynamic* CreateRigidDynamic(const PxTransform& InTransform);
+    PxRigidDynamic* CreateRigidDynamic(const PxTransform& InTransform, bool bIsKinematic);
+
     PxShape* CreateBoxShape(const struct FKBoxElem& BoxElem);
     PxShape* CreateSphereShape(const struct FKSphereElem& SphereElem);
     PxShape* CreateSphylShape(const struct FKSphylElem& SphylElem);
