@@ -36,8 +36,7 @@ void FPhysicsSolver::InitScene(FPhysScene* InScene) const
 }
 
 // TODO : 일단 FBodyInstance를 사용해서 함
-// 이후에는 UstaticMesh, USkeletalMesh,
-// 추후에는 Actor단위로 받아서 할 것.
+// 이후에 Register를 UstaticMesh, USkeletalMesh, 또는 Actor단위로 받아서 할 것.
 PxActor* FPhysicsSolver::RegisterObject(FPhysScene* InScene, const FBodyInstance* NewInstance)
 {
     if (!NewInstance)
@@ -64,44 +63,115 @@ PxActor* FPhysicsSolver::RegisterObject(FPhysScene* InScene, const FBodyInstance
 
     PxPhysics* Physics = FPhysxSolversModule::GetModule()->Physics;
 
+    PxRigidActor* NewRigidActor = nullptr;
+
+    // Static인지 Dynamic인지 구분
+    switch (NewInstance->ObjectType)
+    {
+    case ECollisionChannel::ECC_WorldStatic:
+    {
+        PxRigidStatic* NewRigidStatic = Physics->createRigidStatic(InitialTransform);
+        if (NewInstance->bSimulatePhysics)
+        {
+            UE_LOG(ELogLevel::Warning, TEXT("WorldStatic cannot simulate physics!"));
+        }
+        NewRigidActor = NewRigidStatic; // Static Actor로 설정
+        break;
+    }
+    case ECollisionChannel::ECC_WorldDynamic:
+    {
+        PxRigidDynamic* NewDynamicActor = Physics->createRigidDynamic(InitialTransform);
+        if (NewInstance->bSimulatePhysics)
+        {
+            NewDynamicActor->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, false); // 시뮬레이션 결과를 따르게 설정
+        }
+        else
+        {
+            NewDynamicActor->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true); // 시뮬레이션 결과를 무시하게 설정
+        }
+        NewRigidActor = NewDynamicActor; // Dynamic Actor로 설정
+        break;
+    }
+    default:
+    {
+        NewRigidActor = nullptr; // default에서도 명시적으로 초기화
+        assert(0);
+        break;
+    }
+    }
+
+    // 중력에 영향을 받는지 구분
+    switch (NewInstance->bEnableGravity)
+    {
+    case true:
+        NewRigidActor->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, false);
+        break;
+    case false:
+        NewRigidActor->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, true);
+        break;
+    }
+
+    NewRigidActor->setActorFlag(PxActorFlag::eVISUALIZATION, true); // 디버그 렌더링 활성화
+    NewRigidActor->setName(*NewInstance->OwnerComponent->GetName()); // 이름 설정
+
+    NewRigidActor->userData = (void*)NewInstance; // 사용자 정의 데이터로 FBodyInstance를 설정
+
     const FKAggregateGeom& AggGeom = NewInstance->ExternalCollisionProfileBodySetup->AggGeom;
     float Volume = 0.f;
-    PxRigidDynamic* NewDynamic = Physics->createRigidDynamic(InitialTransform);
+
     for (const FKBoxElem& BoxElem : AggGeom.BoxElems)
     {
-        NewDynamic->userData = (void*)NewInstance; // 사용자 정의 데이터로 FBodyInstance를 설정
         PxBoxGeometry BoxGeometry(PxVec3(BoxElem.X, BoxElem.Y, BoxElem.Z)); // 크기
         PxShape* NewShape = Physics->createShape(BoxGeometry, *FPhysxSolversModule::GetModule()->DefaultMaterial); // 
         
         FVector Center = BoxElem.Center;
         FQuat Quat = BoxElem.Rotation.Quaternion();
         NewShape->setLocalPose(PxTransform(PxVec3(Center.X, Center.Y, Center.Z), PxQuat(Quat.X, Quat.Y, Quat.Z, Quat.W)));
-        NewDynamic->attachShape(*NewShape);
+        NewRigidActor->attachShape(*NewShape);
         
         Volume = Volume + BoxElem.X * BoxElem.Y * BoxElem.Z;
     }
-    float Mass = NewInstance->MassScale 
-        * NewInstance->ExternalCollisionProfileBodySetup->PhysMaterial->Density * Volume;
-    physx::PxRigidBodyExt::updateMassAndInertia(*NewDynamic, NewInstance->MassScale);
 
-    ECollisionChannel Channel = NewInstance->ObjectType;
-    switch (Channel)
+    for (const FKSphereElem& SphereElem : AggGeom.SphereElems)
     {
-    case ECollisionChannel::ECC_WorldStatic:
-        NewDynamic->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
-        NewDynamic->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, true);
-        break;
-    case ECollisionChannel::ECC_WorldDynamic:
-        NewDynamic->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, false);
-        NewDynamic->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, false);
-        break;
-    default:
-        assert(0);
-        break;
-    }
-    Scene->addActor(*NewDynamic);
+        PxSphereGeometry SphereGeometry(SphereElem.Radius);
+        PxShape* NewShape = Physics->createShape(SphereGeometry, *FPhysxSolversModule::GetModule()->DefaultMaterial);
 
-    return NewDynamic;
+        FVector Center = SphereElem.Center;
+        NewShape->setLocalPose(PxTransform(PxVec3(Center.X, Center.Y, Center.Z)));
+        NewRigidActor->attachShape(*NewShape);
+
+        Volume += 4.0f / 3.0f * PI * FMath::Pow(SphereElem.Radius, 3);
+    }
+
+    for (const FKSphylElem& SphylElem : AggGeom.SphylElems)
+    {
+        PxCapsuleGeometry CapsuleGeometry(SphylElem.Radius, SphylElem.Length);
+        PxShape* NewShape = Physics->createShape(CapsuleGeometry, *FPhysxSolversModule::GetModule()->DefaultMaterial);
+        FVector Center = SphylElem.Center;
+        FQuat Quat = SphylElem.Rotation.Quaternion();
+        NewShape->setLocalPose(PxTransform(PxVec3(Center.X, Center.Y, Center.Z), PxQuat(Quat.X, Quat.Y, Quat.Z, Quat.W)));
+        NewRigidActor->attachShape(*NewShape);
+        Volume += PI * FMath::Pow(SphylElem.Radius, 2) * SphylElem.Length // 중간의 원기둥
+            + 4.0f / 3.0f * PI * FMath::Pow(SphylElem.Radius, 3); // 양 끝부분 구
+    }
+
+    if (PxRigidDynamic* RigidDynamic = NewRigidActor->is<PxRigidDynamic>())
+    {
+        // Dynamic Actor의 경우, PhysMaterial이 설정되어 있어야 함
+        if (!NewInstance->ExternalCollisionProfileBodySetup->PhysMaterial)
+        {
+            UE_LOG(ELogLevel::Warning, TEXT("Dynamic Actor must have a PhysMaterial. Setting MassScale and Density to 1"));
+            return nullptr;
+        }
+        float Mass = NewInstance->MassScale 
+            * NewInstance->ExternalCollisionProfileBodySetup->PhysMaterial->Density * Volume;
+        physx::PxRigidBodyExt::updateMassAndInertia(*RigidDynamic, NewInstance->MassScale);
+
+    }
+    Scene->addActor(*NewRigidActor);
+
+    return NewRigidActor;
 }
 
 void FPhysicsSolver::AdvanceOneTimeStep(FPhysScene* InScene, float Dt)

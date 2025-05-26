@@ -34,5 +34,10 @@ public:
 private:
     FStaticMeshRenderData* RenderData = nullptr;
     TArray<FStaticMaterial*> Materials;
-    UBodySetup* BodySetup = nullptr;
+    UPROPERTY(
+        EditAnywhere | EditInline,
+        UBodySetup*,
+        BodySetup,
+        = nullptr
+    )
 };

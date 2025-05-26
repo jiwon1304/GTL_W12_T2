@@ -33,6 +33,22 @@ struct FBodyInstance
 {
     DECLARE_STRUCT(FBodyInstance)
 
+    // simulation을 사용할 것인지의 여부
+    // false일 경우 움직이지 않음
+    UPROPERTY(
+        EditAnywhere,
+        bool,
+        bSimulatePhysics,
+        = true
+    )
+
+    UPROPERTY(
+        EditAnywhere,
+        bool,
+        bEnableGravity,
+        = true
+    )
+
     // SkeletalMeshComponent / PhysicsAsset에서의 index
     int32 InstanceBodyIndex;
 
