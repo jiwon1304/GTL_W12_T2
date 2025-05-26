@@ -216,8 +216,6 @@ xcopy /y /d "$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\FBX\lib\x64\$
     <ClCompile Include="Engine\Source\Contents\Components\FishTailComponent.cpp" />
     <ClCompile Include="Engine\Source\Developer\PhysicsUtilities\PhysicsAssetUtils.cpp" />
     <ClCompile Include="Engine\Source\Editor\PropertyEditor\PhysicsAssetEditorPanel.cpp" />
-    <ClCompile Include="Engine\Source\Developer\PhysicsUtilities\PhysicsAssetUtils.cpp" />
-    <ClCompile Include="Engine\Source\Editor\PropertyEditor\PhysicsAssetEditorPanel.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Components\ParticleSystemComponent.cpp" />
     <ClCompile Include="Engine\Source\Contents\Objects\DamageCameraShake.cpp" />
     <ClCompile Include="Engine\Source\Developer\AnimDataController\AnimDataController.cpp" />
@@ -368,7 +366,6 @@ xcopy /y /d "$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\FBX\lib\x64\$
     <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Particles\ParticleModules\ParticleModuleVelocityBase.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Particles\ParticleSpriteEmitter.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Engine\Classes\PhysicsEngine\PhysicsAsset.cpp" />
-    <ClCompile Include="Engine\Source\Runtime\Engine\World\PhysicsAssetWorld.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Engine\ReferenceSkeleton.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Engine\UnrealClient.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Engine\UserInterface\Console.cpp" />
@@ -380,11 +377,8 @@ xcopy /y /d "$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\FBX\lib\x64\$
     <ClCompile Include="Engine\Source\Runtime\InteractiveToolsFramework\BaseGizmos\GizmoBaseComponent.cpp" />
     <ClCompile Include="Engine\Source\Runtime\InteractiveToolsFramework\BaseGizmos\GizmoCircleComponent.cpp" />
     <ClCompile Include="Engine\Source\Runtime\InteractiveToolsFramework\BaseGizmos\GizmoRectangleComponent.cpp" />
-    <ClCompile Include="Engine\Source\Runtime\PhysicsCore\CollisionManager.cpp" />
-    <ClCompile Include="Engine\Source\Runtime\PhysicsCore\PhysicsScene.cpp" />
-    <ClCompile Include="Engine\Source\Runtime\PhysicsCore\PhysicsSolver.cpp" />
-    <ClCompile Include="Engine\Source\Runtime\PhysicsCore\PhysXIntegration.cpp" />
-    <ClCompile Include="Engine\Source\Runtime\PhysicsCore\PhysxSolversModule.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\InteractiveToolsFramework\BaseGizmos\TransformGizmo.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Launch\EngineLoop.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Launch\ImGuiManager.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Launch\Launch.cpp" />
     <ClCompile Include="Engine\Source\Runtime\PhysicsCore\CollisionManager.cpp" />
@@ -545,8 +539,6 @@ xcopy /y /d "$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\FBX\lib\x64\$
     <ClInclude Include="Engine\Source\Contents\Actors\ParticleSystemActor.h" />
     <ClInclude Include="Engine\Source\Contents\Actors\Fish.h" />
     <ClInclude Include="Engine\Source\Contents\Actors\GoalPlatformActor.h" />
-    <ClInclude Include="Engine\Source\Developer\PhysicsUtilities\PhysicsAssetUtils.h" />
-    <ClInclude Include="Engine\Source\Editor\PropertyEditor\PhysicsAssetEditorPanel.h" />
     <ClInclude Include="Engine\Source\Contents\Actors\ItemActor.h" />
     <ClInclude Include="Engine\Source\Contents\Actors\PlatformActor.h" />
     <ClInclude Include="Engine\Source\Contents\Actors\SkeletalMeshActorTest.h" />
@@ -757,6 +749,15 @@ xcopy /y /d "$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\FBX\lib\x64\$
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Particles\ParticleModules\ParticleModuleSubUV.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Particles\ParticleModules\ParticleModuleTypeDataBase.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Particles\ParticleModules\ParticleModuletypeDataMesh.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Particles\ParticleModules\ParticleModuleLifetime.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Particles\ParticleModules\ParticleModuleVelocity.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Particles\ParticleModules\ParticleModuleVelocityBase.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Particles\ParticleSpriteEmitter.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Particles\ParticleSystem.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Particles\ParticleModules\ParticleModuleRequired.h" />
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\PhysicsEngine\AggregateGeom.h" />
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\PhysicsEngine\BodyInstance.h" />
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\PhysicsEngine\BodySetup.h" />
@@ -767,39 +768,6 @@ xcopy /y /d "$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\FBX\lib\x64\$
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\PhysicsEngine\ShapeElem.h" />
     <ClInclude Include="Engine\Source\Runtime\Engine\EngineTypes.h" />
     <ClInclude Include="Engine\Source\Runtime\Engine\PhysxUserData.h" />
-    </ClInclude>
-    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Particles\ParticleModules\ParticleModuleTypeDataBase.h" />
-    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Particles\ParticleModules\ParticleModuletypeDataMesh.h" />
-    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Particles\ParticleModules\ParticleModuleLifetime.h" />
-    <ClInclude Include="Engine\Source\Runtime\Engine\World\PhysicsAssetWorld.h" />
-    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Particles\ParticleModules\ParticleModuleVelocity.h" />
-    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Particles\ParticleModules\ParticleModuleVelocityBase.h" />
-    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Particles\ParticleSpriteEmitter.h" />
-    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Particles\ParticleSystem.h" />
-    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Particles\ParticleModules\ParticleModuleRequired.h" />
-<<<<<<< HEAD
-    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\PhysicsEngine\PhysicsAsset.h" />
-=======
-    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\PhysicsEngine\AggregateGeom.h" />
-    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\PhysicsEngine\BodyInstance.h" />
-    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\PhysicsEngine\BodySetup.h" />
-    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\PhysicsEngine\ConstraintInstance.h" />
-    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\PhysicsEngine\ConstraintTypes.h" />
-    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\PhysicsEngine\PhysicsAsset.h" />
-    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\PhysicsEngine\PhysicsConstraintTemplate.h" />
-    <ClInclude Include="Engine\Source\Runtime\PhysicalMaterials\Defines.h" />
-    <ClInclude Include="Engine\Source\Runtime\PhysicalMaterials\PhysicalMaterial.h" />
-    <ClInclude Include="Engine\Source\Runtime\PhysicsCore\BodySetupCore.h" />
-    <ClInclude Include="Engine\Source\Runtime\PhysicsCore\CollisionManager.h" />
-    <ClInclude Include="Engine\Source\Runtime\PhysicsCore\CollisionShape.h" />
-    <ClInclude Include="Engine\Source\Runtime\PhysicsCore\ImplicitObject.h" />
-    <ClInclude Include="Engine\Source\Runtime\PhysicsCore\PhysicsScene.h" />
-    <ClInclude Include="Engine\Source\Runtime\PhysicsCore\PhysicsSolver.h" />
-    <ClInclude Include="Engine\Source\Runtime\PhysicsCore\PhysXHelper.h" />
-    <ClInclude Include="Engine\Source\Runtime\PhysicsCore\PhysXIntegration.h" />
-    <ClInclude Include="Engine\Source\Runtime\PhysicsCore\PhysxSolversModule.h" />
-    <ClInclude Include="Engine\Source\Runtime\Engine\PhysxUserData.h" />
->>>>>>> main
     <ClInclude Include="Engine\Source\Runtime\Engine\ReferenceSkeleton.h" />
     <ClInclude Include="Engine\Source\Runtime\Engine\UnrealClient.h" />
     <ClInclude Include="Engine\Source\Runtime\Engine\UserInterface\Console.h" />
