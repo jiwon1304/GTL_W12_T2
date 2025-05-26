@@ -13,7 +13,7 @@ public:
     virtual void OnResize(HWND hWnd) override;
 
 private:
-    void RenderAddButton();
+    void RenderAddShapeButton();
     void RenderPhysicsAssetFilter();
     void RenderSkeletonBoneTree(const FReferenceSkeleton& RefSkeleton, int32 BoneIndex);
     void LoadBoneIcon();
