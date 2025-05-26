@@ -40,12 +40,15 @@ public:
     int32 SelectedBodySetupIndex = -1;
     FSelectedPrimitive SelectedPrimitive;
 
+    // TODO UISOO 조금만 늦게
+    // int32 SelectedConstraint = -1;
 
-    uint8 bShowBoneIndices : 1 = false;
+
+    uint8 bShowBoneIndices : 1 = true;
     uint8 bShowBones : 1 = true;
     uint8 bShowBodies : 1 = true;
-    uint8 bShowConstraints : 1 = false;
-    uint8 bShowPrimitives : 1 = false;
+    uint8 bShowConstraints : 1 = true;
+    uint8 bShowPrimitives : 1 = true;
     
 private:
     USkeletalMeshComponent* SkeletalMeshComponent = nullptr;
