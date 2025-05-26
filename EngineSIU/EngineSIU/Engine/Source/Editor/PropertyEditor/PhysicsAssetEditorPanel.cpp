@@ -33,32 +33,36 @@ void FPhysicsAssetEditorPanel::Render()
     }
 
     /* Pre Setup */
-    float PanelWidth = (Width) * 0.2f - 6.0f;
-    float PanelHeight = (Height) * 0.7f;
+    float TreePanelWidth = (Width) * 0.2f - 6.0f;
+    float TreePanelHeight = (Height) * 0.7f;
 
-    float PanelPosX = (Width) * 0.8f+5.0f;
-    float PanelPosY = 5.0f;
+    float TreePanelPosX = (Width) * 0.8f+5.0f;
+    float TreePanelPosY = 5.0f;
 
-    ImVec2 MinSize(140, 100);
-    ImVec2 MaxSize(FLT_MAX, 1000);
+    ImVec2 TreeMinSize(140, 100);
+    ImVec2 TreeMaxSize(FLT_MAX, 1000);
 
     /* Min, Max Size */
-    ImGui::SetNextWindowSizeConstraints(MinSize, MaxSize);
+    ImGui::SetNextWindowSizeConstraints(TreeMinSize, TreeMaxSize);
     /* Panel Position */
-    ImGui::SetNextWindowPos(ImVec2(PanelPosX, PanelPosY), ImGuiCond_Always);
+    ImGui::SetNextWindowPos(ImVec2(TreePanelPosX, TreePanelPosY), ImGuiCond_Always);
 
     /* Panel Size */
-    ImGui::SetNextWindowSize(ImVec2(PanelWidth, PanelHeight), ImGuiCond_Always);
+    ImGui::SetNextWindowSize(ImVec2(TreePanelWidth, TreePanelHeight), ImGuiCond_Always);
 
     constexpr ImGuiWindowFlags PanelFlags = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_HorizontalScrollbar;
 
     // TODO UISOO Implement First
 
-    // Draw
-
+    ImGui::Begin("Bone Hierarchy", nullptr, PanelFlags); // 창 이름 변경
     RenderAddPrimitiveButton();
     ImGui::SameLine();
     RenderPhysicsAssetFilter();
+
+    ImGui::Spacing();
+
+    // BoneTree
+    ImGui::End();
 
     // Delete Key -> Delete
     // Internal -> Add/Remove - BobySetup
