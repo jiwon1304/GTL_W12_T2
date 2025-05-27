@@ -42,23 +42,28 @@ float GetSceneDepth(float2 uv)
 }
 
 // focus 영역으로부터 멀면 1.0, focus 영역이면 0을 리턴하는 함수
-float GetFocusFactor(float centerDepth, float FocalDistance, float FocalRegion, float Multiplier)
+float GetFocusFactor(float centerDepth, float FocalDistance, float FocalRegion, float BlurAmount)
 {
-    // 포커스 영역: [FocalDistance, FocalDistance + FocalRegion]
-    if (centerDepth >= FocalDistance && centerDepth <= FocalDistance + FocalRegion)
+    // 거리 기반으로 초점 영역을 확장
+    float dynamicFocalRegion = FocalRegion * (1.0 + centerDepth * BlurAmount);
+
+    if (centerDepth >= FocalDistance && centerDepth <= FocalDistance + dynamicFocalRegion)
     {
         return 0.0; // 완전한 포커스(블러 없음)
     }
     else if (centerDepth < FocalDistance)
     {
-        // 포커스 영역보다 카메라 쪽이면, 포커스 영역과의 거리만큼 blur 증가
-        return saturate((FocalDistance - centerDepth) / FocalRegion * Multiplier);
+        return saturate((FocalDistance - centerDepth) / dynamicFocalRegion);
     }
-    else // centerDepth > FocalDistance + FocalRegion
+    else
     {
-        // 포커스 영역보다 멀면, 포커스 영역과의 거리만큼 blur 증가
-        return saturate((centerDepth - (FocalDistance + FocalRegion)) / FocalRegion * Multiplier);
+        return saturate((centerDepth - (FocalDistance + dynamicFocalRegion)) / dynamicFocalRegion);
     }
+}
+
+float Gaussian(float x, float sigma)
+{
+    return exp(-(x * x) / (2.0 * sigma * sigma));
 }
 
 float4 mainPS(VS_OUTPUT input) : SV_Target
@@ -71,7 +76,6 @@ float4 mainPS(VS_OUTPUT input) : SV_Target
     float centerDepth = GetSceneDepth(uv);
     float FocusFactor = GetFocusFactor(centerDepth, FocalDistance, FocalRegion, BlurAmount);
 
-    float depthThreshold = 0.02; // 상황에 맞게 조절
 
     for (int i = -k; i <= k; ++i)
     {
@@ -83,7 +87,9 @@ float4 mainPS(VS_OUTPUT input) : SV_Target
             float DepthAdj = GetSceneDepth(UVAdj);
             float FocusFactorAdj = GetFocusFactor(DepthAdj, FocalDistance, FocalRegion, BlurAmount);
             
-            float Weight = FocusFactorAdj;
+            float SamplingWeight = Gaussian(length(float2(i, j)), BlurRadius);
+
+            float Weight = FocusFactorAdj * SamplingWeight;
             
             float3 ColorAdj = SceneTexture.Sample(SceneSampler, UVAdj).rgb;
             FinalColor += ColorAdj * Weight;
