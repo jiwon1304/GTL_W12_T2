@@ -26,8 +26,10 @@ private:
     void DrawPopupBodySetup(UPhysicsAsset* PhysicsAsset, UBodySetup* BodySetup, int32 InBoneIndex);
     void DrawPopupBone(UPhysicsAsset* PhysicsAsset, UBodySetup* BodySetup, int32 InBoneIndex) const;
     void DrawPopupPrimitive(UBodySetup* InBodySetup, EAggCollisionShape::Type PrimitiveType, uint32 PrimitiveIndex);
+    void DrawPopupConstraint();
     
-    FString GetCleanBoneName(const FMeshBoneInfo& BoneInfo, int32 BoneIndex, uint8 bShowBoneIndices) const;
+    FString GetCleanBoneName(const FMeshBoneInfo& BoneInfo, int32 BoneIndex = -1, uint8 bShowBoneIndices = false) const;
+    FString GetCleanBoneName(const FString& InFullName) const;
     void LoadBoneIcon();
     void AddShape(UPhysicsAsset* InPhysicsAsset, UBodySetup* TargetBodySetup, int32 BoneIndex, EAggCollisionShape::Type InShapeType) const;
     
@@ -38,7 +40,9 @@ private:
     ID3D11ShaderResourceView* NonWeightBoneIconSRV = nullptr;
 
     ID3D11ShaderResourceView* BodySetupIconSRV = nullptr;
+    ID3D11ShaderResourceView* ConstraintIconSRV = nullptr;
     ID3D11ShaderResourceView* BoxIconSRV = nullptr;
     ID3D11ShaderResourceView* SphereIconSRV = nullptr;
     ID3D11ShaderResourceView* SphylIconSRV = nullptr;
+
 };
