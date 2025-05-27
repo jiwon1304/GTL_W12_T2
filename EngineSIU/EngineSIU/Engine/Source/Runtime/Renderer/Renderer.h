@@ -43,6 +43,7 @@ class FFogRenderPass;
 class FCameraEffectRenderPass;
 class FCompositingPass;
 class FSlateRenderPass;
+class FOverlayShapeRenderPass;
 class FEditorRenderPass;
 class FDepthPrePass;
 class FTileLightCullingPass;
@@ -108,6 +109,7 @@ public:
     FLineRenderPass* LineRenderPass = nullptr;
     FFogRenderPass* FogRenderPass = nullptr;
     FCameraEffectRenderPass* CameraEffectRenderPass = nullptr;
+    FOverlayShapeRenderPass* OverlayShapeRenderPass = nullptr;
     FEditorRenderPass* EditorRenderPass = nullptr;
     
     FDepthPrePass* DepthPrePass = nullptr;
