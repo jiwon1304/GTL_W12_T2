@@ -404,6 +404,7 @@ void FRenderer::RenderPostProcess(const std::shared_ptr<FEditorViewportClient>& 
          */
     }
 
+    if(ShowFlag & EEngineShowFlags::SF_DOF)
     {
         BlurRenderPass->Render(Viewport);
     }

@@ -78,6 +78,16 @@ void FBlurRenderPass::PrepareRenderState()
 
 void FBlurRenderPass::Render(const std::shared_ptr<FEditorViewportClient>& Viewport)
 {
+    if (!GEngine->ActiveWorld->GetPlayerController() || !GEngine->ActiveWorld->GetPlayerController()->PlayerCameraManager)
+    {
+        return;
+    }
+    const FPostProcessSettings& PostProcessSettings = GEngine->ActiveWorld->GetPlayerController()->PlayerCameraManager->PostProcessSettings;
+    if (!PostProcessSettings.bDepthOfField)
+    {
+        return;
+    }
+
     // 해당 뷰포트 크기만큼 새로운 텍스쳐를 생성합니다.
     // rgb값은 저장되고, 알파 채널에는 blurriness 가 저장됩니다.
     // focal distance에서 focal distance + focal region만큼은 0 이 저장되며, 멀어질수록 1이 됩니다.
@@ -99,23 +109,10 @@ void FBlurRenderPass::Render(const std::shared_ptr<FEditorViewportClient>& Viewp
     FConstantBufferDOF DOFParams;
     BufferManager->BindConstantBuffer("DOFConstantBuffer", 0, EShaderStage::Pixel);
 
-    if (GEngine->ActiveWorld->GetPlayerController() && GEngine->ActiveWorld->GetPlayerController()->PlayerCameraManager) {
-        DOFParams.FocalDistance = GEngine->ActiveWorld->GetPlayerController()
-            ->PlayerCameraManager->PostProcessSettings.DepthOfFieldFocalDistance;
-        DOFParams.FocalRegion = GEngine->ActiveWorld->GetPlayerController()
-            ->PlayerCameraManager->PostProcessSettings.DepthOfFieldFocalRegion;
-        DOFParams.BlurAmount = GEngine->ActiveWorld->GetPlayerController()
-            ->PlayerCameraManager->PostProcessSettings.DepthOfFieldDepthBlurAmount;
-        DOFParams.BlurRadius = GEngine->ActiveWorld->GetPlayerController()
-            ->PlayerCameraManager->PostProcessSettings.DepthOfFieldDepthBlurRadius;
-    }
-    else
-    {
-        DOFParams.FocalDistance = 1.0f; // 기본값
-        DOFParams.FocalRegion = 1.0f; // 기본값
-        DOFParams.BlurAmount = 1.0f; // 기본값
-        DOFParams.BlurRadius = 5.0f; // 기본값
-    }
+    DOFParams.FocalDistance = PostProcessSettings.DepthOfFieldFocalDistance;
+    DOFParams.FocalRegion = PostProcessSettings.DepthOfFieldFocalRegion;
+    DOFParams.BlurAmount = PostProcessSettings.DepthOfFieldDepthBlurAmount;
+    DOFParams.BlurRadius = PostProcessSettings.DepthOfFieldDepthBlurRadius;
 
     BufferManager->UpdateConstantBuffer("DOFConstantBuffer", DOFParams);
 

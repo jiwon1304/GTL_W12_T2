@@ -19,27 +19,9 @@ struct FPostProcessSettings
     UPROPERTY(
         EditAnywhere,
         bool,
-        bOverride_DepthOfFieldFocalDistance,
+        bDepthOfField,
         = false
-        )
-    UPROPERTY(
-        EditAnywhere,
-        bool,
-        bOverride_DepthOfFieldFocalRegion,
-        = false
-        )
-    UPROPERTY(
-        EditAnywhere,
-        bool,
-        bOverride_DepthOfFieldDepthBlurAmount,
-        = false
-        )
-    UPROPERTY(
-        EditAnywhere,
-        bool,
-        bOverride_DepthOfFieldDepthBlurRadius,
-        = false
-        )
+    )
 
     // 초점이 맞기 시작하는 거리
     UPROPERTY(

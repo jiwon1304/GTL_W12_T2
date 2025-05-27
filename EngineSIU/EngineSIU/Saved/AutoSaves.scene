@@ -1,102 +1,77 @@
 {
     "Actors": [
         {
-            "ActorClass": "ACube",
-            "ActorID": "ACube_287",
-            "ActorLabel": "ACube287",
+            "ActorClass": "AFish",
+            "ActorID": "AFish_249",
+            "ActorLabel": "OBJ_FISH_249",
             "ActorTickInEditor": "false",
             "Components": [
                 {
-                    "ComponentClass": "UStaticMeshComponent",
-                    "ComponentID": "StaticMeshComponent_0",
+                    "ComponentClass": "UFishTailComponent",
+                    "ComponentID": "FishTailComponent_0",
                     "Properties": {
-                        "AABB_max": "X=1.287 Y=1.199 Z=2.555",
-                        "AABB_min": "X=-1.287 Y=-1.199 Z=-0.000",
-                        "AttachParentID": "nullptr",
-                        "ComponentClass": "UStaticMeshComponent",
-                        "ComponentName": "StaticMeshComponent_0",
-                        "ComponentOwner": "ACube_287",
-                        "ComponentOwnerClass": "ACube",
-                        "RelativeLocation": "X=0.000 Y=10.323 Z=0.000",
-                        "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=-0.000",
+                        "AABB_max": "X=0.187 Y=-0.000 Z=0.664",
+                        "AABB_min": "X=-0.187 Y=-1.549 Z=-0.638",
+                        "AttachParentID": "FishBodyComponent_0",
+                        "ComponentClass": "UFishTailComponent",
+                        "ComponentName": "FishTailComponent_0",
+                        "ComponentOwner": "AFish_249",
+                        "ComponentOwnerClass": "AFish",
+                        "RelativeLocation": "X=0.000 Y=0.000 Z=0.000",
+                        "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=0.000",
                         "RelativeScale3D": "X=1.000 Y=1.000 Z=1.000",
-                        "StaticMeshPath": "Contents/Reference/Reference.obj",
+                        "StaticMeshPath": "Contents/Fish/Fish_Back.obj",
                         "bAutoActivate": "true",
                         "bIsActive": "true",
                         "m_Type": ""
                     }
-                }
-            ],
-            "RootComponentID": "StaticMeshComponent_0"
-        },
-        {
-            "ActorClass": "ADirectionalLight",
-            "ActorID": "ADirectionalLight_290",
-            "ActorLabel": "ADirectionalLight290",
-            "ActorTickInEditor": "false",
-            "Components": [
+                },
                 {
-                    "ComponentClass": "UBillboardComponent",
-                    "ComponentID": "UBillboardComponent_0",
+                    "ComponentClass": "USphereComponent",
+                    "ComponentID": "SphereComponent_0",
                     "Properties": {
                         "AABB_max": "X=0.000 Y=0.000 Z=0.000",
                         "AABB_min": "X=0.000 Y=0.000 Z=0.000",
                         "AttachParentID": "nullptr",
-                        "BufferKey": "Assets/Editor/Icon/S_LightDirectional.PNG",
-                        "ComponentClass": "UBillboardComponent",
-                        "ComponentName": "UBillboardComponent_0",
-                        "ComponentOwner": "ADirectionalLight_290",
-                        "ComponentOwnerClass": "ADirectionalLight",
-                        "FinalIndexU": "0.000000",
-                        "FinalIndexV": "0.000000",
+                        "ComponentClass": "USphereComponent",
+                        "ComponentName": "SphereComponent_0",
+                        "ComponentOwner": "AFish_249",
+                        "ComponentOwnerClass": "AFish",
                         "RelativeLocation": "X=0.000 Y=0.000 Z=0.000",
-                        "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=0.000",
+                        "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=-0.000",
                         "RelativeScale3D": "X=1.000 Y=1.000 Z=1.000",
+                        "SphereRadius": "1.000000",
                         "bAutoActivate": "true",
                         "bIsActive": "true",
-                        "m_Type": "UBillboardComponent"
+                        "m_Type": ""
                     }
                 },
                 {
-                    "ComponentClass": "UDirectionalLightComponent",
-                    "ComponentID": "UDirectionalLightComponent_0",
+                    "ComponentClass": "USpringArmComponent",
+                    "ComponentID": "SpringArmComponent_0",
                     "Properties": {
-                        "AABB_Max": "X=1.000 Y=1.000 Z=0.100",
-                        "AABB_Min": "X=-1.000 Y=-1.000 Z=-0.100",
-                        "AttachParentID": "UBillboardComponent_0",
-                        "ComponentClass": "UDirectionalLightComponent",
-                        "ComponentName": "UDirectionalLightComponent_0",
-                        "ComponentOwner": "ADirectionalLight_290",
-                        "ComponentOwnerClass": "ADirectionalLight",
-                        "Direction": "X=-1.000 Y=-0.000 Z=-0.000",
-                        "Intensity": "10.000000",
-                        "LightColor": "R=1.000 G=1.000 B=1.000 A=1.000",
+                        "AttachParentID": "SphereComponent_0",
+                        "ComponentClass": "USpringArmComponent",
+                        "ComponentName": "SpringArmComponent_0",
+                        "ComponentOwner": "AFish_249",
+                        "ComponentOwnerClass": "AFish",
                         "RelativeLocation": "X=0.000 Y=0.000 Z=0.000",
-                        "RelativeRotation": "Pitch=1.400 Yaw=6.300 Roll=1.300",
+                        "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=-0.000",
                         "RelativeScale3D": "X=1.000 Y=1.000 Z=1.000",
                         "bAutoActivate": "true",
                         "bIsActive": "true"
                     }
-                }
-            ],
-            "RootComponentID": "UBillboardComponent_0"
-        },
-        {
-            "ActorClass": "AFish",
-            "ActorID": "AFish_295",
-            "ActorLabel": "AFish295",
-            "ActorTickInEditor": "false",
-            "Components": [
+                },
                 {
                     "ComponentClass": "UFishBodyComponent",
-                    "ComponentID": "UFishBodyComponent_298",
+                    "ComponentID": "FishBodyComponent_0",
                     "Properties": {
                         "AABB_max": "X=0.577 Y=2.584 Z=0.985",
                         "AABB_min": "X=-0.577 Y=-0.000 Z=-0.655",
-                        "AttachParentID": "USphereComponent_297",
+                        "AttachParentID": "SphereComponent_0",
                         "ComponentClass": "UFishBodyComponent",
-                        "ComponentName": "UFishBodyComponent_298",
-                        "ComponentOwner": "AFish_295",
+                        "ComponentName": "FishBodyComponent_0",
+                        "ComponentOwner": "AFish_249",
                         "ComponentOwnerClass": "AFish",
                         "RelativeLocation": "X=-0.500 Y=0.000 Z=0.000",
                         "RelativeRotation": "Pitch=0.000 Yaw=-90.000 Roll=0.000",
@@ -109,12 +84,12 @@
                 },
                 {
                     "ComponentClass": "UCameraComponent",
-                    "ComponentID": "UCameraComponent_296",
+                    "ComponentID": "CameraComponent_0",
                     "Properties": {
-                        "AttachParentID": "USpringArmComponent_300",
+                        "AttachParentID": "SpringArmComponent_0",
                         "ComponentClass": "UCameraComponent",
-                        "ComponentName": "UCameraComponent_296",
-                        "ComponentOwner": "AFish_295",
+                        "ComponentName": "CameraComponent_0",
+                        "ComponentOwner": "AFish_249",
                         "ComponentOwnerClass": "AFish",
                         "RelativeLocation": "X=0.000 Y=0.000 Z=0.000",
                         "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=-0.000",
@@ -122,181 +97,9 @@
                         "bAutoActivate": "true",
                         "bIsActive": "true"
                     }
-                },
-                {
-                    "ComponentClass": "USphereComponent",
-                    "ComponentID": "USphereComponent_297",
-                    "Properties": {
-                        "AABB_max": "X=0.000 Y=0.000 Z=0.000",
-                        "AABB_min": "X=0.000 Y=0.000 Z=0.000",
-                        "AttachParentID": "nullptr",
-                        "ComponentClass": "USphereComponent",
-                        "ComponentName": "USphereComponent_297",
-                        "ComponentOwner": "AFish_295",
-                        "ComponentOwnerClass": "AFish",
-                        "RelativeLocation": "X=0.000 Y=0.000 Z=-10.310",
-                        "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=-0.000",
-                        "RelativeScale3D": "X=1.000 Y=1.000 Z=1.000",
-                        "SphereRadius": "1.000000",
-                        "bAutoActivate": "true",
-                        "bIsActive": "true",
-                        "m_Type": ""
-                    }
-                },
-                {
-                    "ComponentClass": "UFishTailComponent",
-                    "ComponentID": "UFishTailComponent_299",
-                    "Properties": {
-                        "AABB_max": "X=0.187 Y=-0.000 Z=0.664",
-                        "AABB_min": "X=-0.187 Y=-1.549 Z=-0.638",
-                        "AttachParentID": "UFishBodyComponent_298",
-                        "ComponentClass": "UFishTailComponent",
-                        "ComponentName": "UFishTailComponent_299",
-                        "ComponentOwner": "AFish_295",
-                        "ComponentOwnerClass": "AFish",
-                        "RelativeLocation": "X=0.000 Y=0.000 Z=0.000",
-                        "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=-0.000",
-                        "RelativeScale3D": "X=1.000 Y=1.000 Z=1.000",
-                        "StaticMeshPath": "Contents/Fish/Fish_Back.obj",
-                        "bAutoActivate": "true",
-                        "bIsActive": "true",
-                        "m_Type": ""
-                    }
-                },
-                {
-                    "ComponentClass": "USpringArmComponent",
-                    "ComponentID": "USpringArmComponent_300",
-                    "Properties": {
-                        "AttachParentID": "USphereComponent_297",
-                        "ComponentClass": "USpringArmComponent",
-                        "ComponentName": "USpringArmComponent_300",
-                        "ComponentOwner": "AFish_295",
-                        "ComponentOwnerClass": "AFish",
-                        "RelativeLocation": "X=-18.000 Y=0.000 Z=4.000",
-                        "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=-0.000",
-                        "RelativeScale3D": "X=1.000 Y=1.000 Z=1.000",
-                        "bAutoActivate": "true",
-                        "bIsActive": "true"
-                    }
                 }
             ],
-            "RootComponentID": "USphereComponent_297"
-        },
-        {
-            "ActorClass": "ACube",
-            "ActorID": "ACube_301",
-            "ActorLabel": "ACube301",
-            "ActorTickInEditor": "false",
-            "Components": [
-                {
-                    "ComponentClass": "UStaticMeshComponent",
-                    "ComponentID": "StaticMeshComponent_0",
-                    "Properties": {
-                        "AABB_max": "X=1.287 Y=1.199 Z=2.555",
-                        "AABB_min": "X=-1.287 Y=-1.199 Z=-0.000",
-                        "AttachParentID": "nullptr",
-                        "ComponentClass": "UStaticMeshComponent",
-                        "ComponentName": "StaticMeshComponent_0",
-                        "ComponentOwner": "ACube_301",
-                        "ComponentOwnerClass": "ACube",
-                        "RelativeLocation": "X=0.000 Y=0.000 Z=0.000",
-                        "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=-0.000",
-                        "RelativeScale3D": "X=1.000 Y=1.000 Z=1.000",
-                        "StaticMeshPath": "Contents/Reference/Reference.obj",
-                        "bAutoActivate": "true",
-                        "bIsActive": "true",
-                        "m_Type": ""
-                    }
-                }
-            ],
-            "RootComponentID": "StaticMeshComponent_0"
-        },
-        {
-            "ActorClass": "APlayerController",
-            "ActorID": "APlayerController_304",
-            "ActorLabel": "OBJ_PLAYER_CONTROLLER_304",
-            "ActorTickInEditor": "false",
-            "Components": [
-                {
-                    "ComponentClass": "UInputComponent",
-                    "ComponentID": "UInputComponent_305",
-                    "Properties": {
-                        "ComponentClass": "UInputComponent",
-                        "ComponentName": "UInputComponent_305",
-                        "ComponentOwner": "APlayerController_304",
-                        "ComponentOwnerClass": "APlayerController",
-                        "bAutoActivate": "true",
-                        "bIsActive": "true"
-                    }
-                },
-                {
-                    "ComponentClass": "USceneComponent",
-                    "ComponentID": "USceneComponent_308",
-                    "Properties": {
-                        "AttachParentID": "nullptr",
-                        "ComponentClass": "USceneComponent",
-                        "ComponentName": "USceneComponent_308",
-                        "ComponentOwner": "APlayerController_304",
-                        "ComponentOwnerClass": "APlayerController",
-                        "RelativeLocation": "X=0.000 Y=0.000 Z=0.000",
-                        "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=0.000",
-                        "RelativeScale3D": "X=1.000 Y=1.000 Z=1.000",
-                        "bAutoActivate": "true",
-                        "bIsActive": "true"
-                    }
-                }
-            ],
-            "RootComponentID": "USceneComponent_308"
-        },
-        {
-            "ActorClass": "APlayerCameraManager",
-            "ActorID": "APlayerCameraManager_306",
-            "ActorLabel": "APlayerCameraManager306",
-            "ActorTickInEditor": "false",
-            "Components": [
-                {
-                    "ComponentClass": "USceneComponent",
-                    "ComponentID": "USceneComponent_307",
-                    "Properties": {
-                        "AttachParentID": "nullptr",
-                        "ComponentClass": "USceneComponent",
-                        "ComponentName": "USceneComponent_307",
-                        "ComponentOwner": "APlayerCameraManager_306",
-                        "ComponentOwnerClass": "APlayerCameraManager",
-                        "RelativeLocation": "X=0.000 Y=0.000 Z=0.000",
-                        "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=0.000",
-                        "RelativeScale3D": "X=1.000 Y=1.000 Z=1.000",
-                        "bAutoActivate": "true",
-                        "bIsActive": "true"
-                    }
-                }
-            ],
-            "RootComponentID": "USceneComponent_307"
-        },
-        {
-            "ActorClass": "AGameMode",
-            "ActorID": "AGameMode_309",
-            "ActorLabel": "OBJ_GAMEMODE_309",
-            "ActorTickInEditor": "false",
-            "Components": [
-                {
-                    "ComponentClass": "USceneComponent",
-                    "ComponentID": "USceneComponent_310",
-                    "Properties": {
-                        "AttachParentID": "nullptr",
-                        "ComponentClass": "USceneComponent",
-                        "ComponentName": "USceneComponent_310",
-                        "ComponentOwner": "AGameMode_309",
-                        "ComponentOwnerClass": "AGameMode",
-                        "RelativeLocation": "X=0.000 Y=0.000 Z=0.000",
-                        "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=0.000",
-                        "RelativeScale3D": "X=1.000 Y=1.000 Z=1.000",
-                        "bAutoActivate": "true",
-                        "bIsActive": "true"
-                    }
-                }
-            ],
-            "RootComponentID": "USceneComponent_310"
+            "RootComponentID": "SphereComponent_0"
         }
     ],
     "NextUUID": 0,
