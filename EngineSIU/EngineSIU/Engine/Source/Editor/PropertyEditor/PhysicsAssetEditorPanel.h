@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "Engine/SkeletalMesh.h"
 #include "GameFramework/Actor.h"   // TODO - Actor를 상속해야 작동함. 상위 클래스에서 문제 발생함. uint8에 접근 못하는듯
+#include "PhysicsEngine/BodySetup.h"
 #include "UnrealEd/EditorPanel.h"
 
 struct FReferenceSkeleton;
@@ -22,8 +23,13 @@ private:
     // 각 Bone에 대해 순회
     void RenderTreeRecursive(USkeletalMesh* InSkeletalMesh, UPhysicsAsset* InPhysicsAsset, int32 InBoneIndex, uint8 bShowBones, uint8 bShowBoneIndices, uint8 bShowBodies, uint8 bShowConstraints, uint8 bShowPrimitives);
     
+    void DrawPopupBodySetup(UPhysicsAsset* PhysicsAsset, UBodySetup* BodySetup, int32 InBoneIndex);
+    void DrawPopupBone(UPhysicsAsset* PhysicsAsset, UBodySetup* BodySetup, int32 InBoneIndex) const;
+    void DrawPopupPrimitive(UBodySetup* InBodySetup, EAggCollisionShape::Type PrimitiveType, uint32 PrimitiveIndex);
+    
     FString GetCleanBoneName(const FMeshBoneInfo& BoneInfo, int32 BoneIndex, uint8 bShowBoneIndices) const;
     void LoadBoneIcon();
+    void AddShape(UPhysicsAsset* InPhysicsAsset, UBodySetup* TargetBodySetup, int32 BoneIndex, EAggCollisionShape::Type InShapeType) const;
     
 private:
     float Width = 0, Height = 0;
