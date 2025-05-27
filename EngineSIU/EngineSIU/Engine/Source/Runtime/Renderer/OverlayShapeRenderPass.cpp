@@ -1,6 +1,4 @@
 #include "OverlayShapeRenderPass.h"
-#include <algorithm>
-#include "D3D11RHI/DXDShaderManager.h"
 #include "D3D11RHI/GraphicDevice.h"
 #include "UnrealEd/EditorViewportClient.h"
 #include "UnrealClient.h"
@@ -98,70 +96,69 @@ void FOverlayShapeRenderPass::PrepareRenderArr()
     Spheres.Add(TPair<Shape::FSphere, FLinearColor>(Shape::FSphere(FVector(0, 0, 0), 10.f), FLinearColor(1,0,0,0.2)));
     Spheres.Add(TPair<Shape::FSphere, FLinearColor>(Shape::FSphere(FVector(0, 0, 5), 10.f), FLinearColor(1,0,0,0.2)));
     Spheres.Add(TPair<Shape::FSphere, FLinearColor>(Shape::FSphere(FVector(0, 0, 10), 10.f), FLinearColor(1,0,0,0.2)));
+
+    Capsules.Add(TPair<Shape::FCapsule, FLinearColor>(Shape::FCapsule(FVector(0, 0, 0), FVector(10,10,10), 5), FLinearColor(0, 1, 0, 0.2)));
+    //Capsules.Add(TPair<Shape::FCapsule, FLinearColor>(Shape::FCapsule(FVector(5, 0, 0), FVector(15,0,0), 3), FLinearColor(0, 1, 0, 0.2)));
+    //Capsules.Add(TPair<Shape::FCapsule, FLinearColor>(Shape::FCapsule(FVector(10, 0, 0), FVector(20,0,0), 3), FLinearColor(0, 1, 0, 0.2)));
+
 }
 
 void FOverlayShapeRenderPass::Render(const std::shared_ptr<FEditorViewportClient>& Viewport)
 {
     StartRender(Viewport);
-    FVector CameraPosition = Viewport->GetCameraLocation();
 
-    Graphics->DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-    if (Spheres.Num() > 0)
+    // 구 (Sphere)
     {
-        // Shader Setup
-        ShaderManager->SetVertexShaderAndInputLayout(L"OverlayShapeVertexShaderSphere", Graphics->DeviceContext);
-        ShaderManager->SetPixelShader(L"OverlayShapePixelShaderSphere", Graphics->DeviceContext);
-
-        // Vertex Index Buffer
-        const FVertexInfo& VertexInfo = BufferManager->GetVertexBuffer(L"OverlaySphereVertexBuffer");
-        UINT Offset = 0;
-        Graphics->DeviceContext->IASetVertexBuffers(0, 1, &VertexInfo.VertexBuffer, &VertexInfo.Stride, &Offset);
-        const FIndexInfo& IndexInfo = BufferManager->GetIndexBuffer(L"OverlaySphereIndexBuffer");
-        Graphics->DeviceContext->IASetIndexBuffer(IndexInfo.IndexBuffer, DXGI_FORMAT_R32_UINT, 0);
-
-        // Constant Buffer
-        // sorting 필요 없음. 그냥 alpha만 가산해서 그림.
-        //std::sort(Spheres.begin(), Spheres.end(),
-        //    [&CameraPosition](const std::pair<Shape::FSphere, FLinearColor>& A, const std::pair<Shape::FSphere, FLinearColor>& B) {
-        //        return FVector::DistSquared(CameraPosition, A.first.Center) > FVector::DistSquared(CameraPosition, B.first.Center);
-        //    }
-        //);
         TArray<Constants::Sphere> SphereConstants;
         SphereConstants.SetNum(Spheres.Num());
         for (int Index = 0; Index < Spheres.Num(); ++Index)
         {
             const Shape::FSphere Sphere = Spheres[Index].Key;
-            const FLinearColor Color = Spheres[Index].Value; 
+            const FLinearColor Color = Spheres[Index].Value;
             SphereConstants[Index].Center = Sphere.Center;
             SphereConstants[Index].Radius = Sphere.Radius;
             SphereConstants[Index].Color = Color;
         }
-
-        BufferManager->BindConstantBuffer("SphereConstantBuffer", 11, EShaderStage::Vertex);
-        BufferManager->BindConstantBuffer("SphereConstantBuffer", 11, EShaderStage::Pixel);
-        int BufferIndex = 0;
-        for (int i = 0; i < (1 + SphereConstants.Num() / ConstantBufferSize) * ConstantBufferSize; ++i)
-        {
-            TArray<Constants::Sphere> SubBuffer;
-
-            for (int j = 0; j < ConstantBufferSize; ++j)
-            {
-                if (BufferIndex >= SphereConstants.Num())
-                {
-                    break;
-                }
-                SubBuffer.Add(SphereConstants[BufferIndex]);
-                ++BufferIndex;
-            }
-
-            if (SubBuffer.Num() > 0)
-            {
-                BufferManager->UpdateConstantBuffer<Constants::Sphere>("SphereConstantBuffer", SubBuffer);
-                Graphics->DeviceContext->DrawIndexedInstanced(IndexInfo.NumIndices, SubBuffer.Num(), 0, 0, 0);
-            }
-        }
+        RenderShapeArray(
+            SphereConstants,
+            L"OverlayShapeVertexShaderSphere",
+            L"OverlayShapePixelShaderSphere",
+            L"OverlaySphereVertexBuffer",
+            L"OverlaySphereIndexBuffer",
+            "SphereConstantBuffer",
+            11,
+            ConstantBufferSize
+        );
     }
+
+    // 캡슐 (Capsule)
+    {
+        TArray<Constants::Capsule> CapsuleConstants;
+        CapsuleConstants.SetNum(Capsules.Num());
+        for (int Index = 0; Index < Capsules.Num(); ++Index)
+        {
+            const Shape::FCapsule Capsule = Capsules[Index].Key;
+            const FLinearColor Color = Capsules[Index].Value;
+            CapsuleConstants[Index].A = Capsule.A;
+            CapsuleConstants[Index].B = Capsule.B;
+            CapsuleConstants[Index].Radius = Capsule.Radius;
+            CapsuleConstants[Index].Color = Color;
+        }
+        // ... CapsuleConstants 채우기 ...
+        RenderShapeArray(
+            CapsuleConstants,
+            L"OverlayShapeVertexShaderCapsule",
+            L"OverlayShapePixelShaderCapsule",
+            L"OverlayCapsuleVertexBuffer",
+            L"OverlayCapsuleIndexBuffer",
+            "CapsuleConstantBuffer",
+            11,
+            ConstantBufferSize
+        );
+    }
+
+    // 박스, 플레인 등도 동일하게 사용 가능
+
     EndRender(Viewport);
 }
 
@@ -184,6 +181,10 @@ void FOverlayShapeRenderPass::CreateShaders()
 
     ShaderManager->AddVertexShaderAndInputLayoutAsync(L"OverlayShapeVertexShaderSphere", L"Shaders/OverlayShapeShader.hlsl", "SphereVS", PositionOnly, 1, nullptr);
     ShaderManager->AddPixelShaderAsync(L"OverlayShapePixelShaderSphere", L"Shaders/OverlayShapeShader.hlsl", "SpherePS", nullptr);
+
+    ShaderManager->AddVertexShaderAndInputLayoutAsync(L"OverlayShapeVertexShaderCapsule", L"Shaders/OverlayShapeShader.hlsl", "CapsuleVS", PositionOnly, 1, nullptr);
+    ShaderManager->AddPixelShaderAsync(L"OverlayShapePixelShaderCapsule", L"Shaders/OverlayShapeShader.hlsl", "CapsulePS", nullptr);
+
 }
 
 void FOverlayShapeRenderPass::CreateBlendState()
@@ -211,10 +212,14 @@ void FOverlayShapeRenderPass::CreateBlendState()
 
 void FOverlayShapeRenderPass::CreateBuffers()
 {
-    TArray<FVector> SphereVertices;
-    TArray<uint32> SphereIndices;
-    const int NumSegments = 32;
-    const int NumRings = 32;
+    CreateSphereBuffer(32, 32);
+    CreateCapsuleBuffer(32, 32);
+}
+
+void FOverlayShapeRenderPass::CreateSphereBuffer(int NumSegments, int NumRings)
+{
+    TArray<FVector> Vertices;
+    TArray<uint32> Indices;
     // 버텍스 생성
     for (int ring = 0; ring <= NumRings; ++ring)
     {
@@ -226,7 +231,7 @@ void FOverlayShapeRenderPass::CreateBuffers()
             float theta = seg * 2.0f * PI / NumSegments; // 0 ~ 2PI
             float x = std::sin(phi) * std::cos(theta);
             float z = std::sin(phi) * std::sin(theta);
-            SphereVertices.Emplace(FVector(x, y, z));
+            Vertices.Emplace(FVector(x, y, z));
         }
     }
 
@@ -239,20 +244,140 @@ void FOverlayShapeRenderPass::CreateBuffers()
             int next = (ring + 1) * (NumSegments + 1) + seg;
 
             // 삼각형 1
-            SphereIndices.Add(curr);
-            SphereIndices.Add(next);
-            SphereIndices.Add(curr + 1);
+            Indices.Add(curr);
+            Indices.Add(next);
+            Indices.Add(curr + 1);
 
             // 삼각형 2
-            SphereIndices.Add(next);
-            SphereIndices.Add(next + 1);
-            SphereIndices.Add(curr + 1);
+            Indices.Add(next);
+            Indices.Add(next + 1);
+            Indices.Add(curr + 1);
         }
     }
     FVertexInfo SphereVertexInfo;
-    BufferManager->CreateVertexBuffer<FVector>("OverlaySphereVertexBuffer", SphereVertices, SphereVertexInfo, D3D11_USAGE_IMMUTABLE, 0);
+    BufferManager->CreateVertexBuffer<FVector>("OverlaySphereVertexBuffer", Vertices, SphereVertexInfo, D3D11_USAGE_IMMUTABLE, 0);
     FIndexInfo SphereIndexInfo;
-    BufferManager->CreateIndexBuffer<uint32>("OverlaySphereIndexBuffer", SphereIndices, SphereIndexInfo, D3D11_USAGE_IMMUTABLE, 0);
+    BufferManager->CreateIndexBuffer<uint32>("OverlaySphereIndexBuffer", Indices, SphereIndexInfo, D3D11_USAGE_IMMUTABLE, 0);
+}
+
+void FOverlayShapeRenderPass::CreateCapsuleBuffer(int NumSegments, int NumRings)
+{
+    // radius = 1, halfheight = 0인 캡슐을 생성
+    // 구로 보이지만, 특정 vertex의 위치를 조절해서 capsule로 이용
+    TArray<FVector> Vertices;
+    TArray<uint32> Indices;
+    // 1. 상단 반구
+    for (int ring = 0; ring <= NumRings / 2; ++ring)
+    {
+        float phi = ring * PI / NumRings; // 0 ~ PI/2
+        float y = FMath::Cos(phi);
+
+        for (int seg = 0; seg <= NumSegments; ++seg)
+        {
+            float theta = seg * 2.0f * PI / NumSegments;
+            float x = FMath::Sin(phi) * FMath::Cos(theta);
+            float z = FMath::Sin(phi) * FMath::Sin(theta);
+            Vertices.Emplace(FVector(x, y, z));
+        }
+    }
+
+    int topHemisphereVerts = (NumRings / 2 + 1) * (NumSegments + 1);
+
+    // 2. 실린더
+    for (int i = 0; i <= 1; ++i)
+    {
+        float y = 0;
+        for (int seg = 0; seg <= NumSegments; ++seg)
+        {
+            float theta = seg * 2.0f * PI / NumSegments;
+            float x = FMath::Cos(theta);
+            float z = FMath::Sin(theta);
+            Vertices.Emplace(FVector(x, y, z));
+        }
+    }
+
+    int cylinderStart = Vertices.Num() - 2 * (NumSegments + 1);
+
+    // 3. 하단 반구
+    for (int ring = NumRings / 2; ring <= NumRings; ++ring)
+    {
+        float phi = ring * PI / NumRings; // PI/2 ~ PI
+        float y = FMath::Cos(phi);
+
+        for (int seg = 0; seg <= NumSegments; ++seg)
+        {
+            float theta = seg * 2.0f * PI / NumSegments;
+            float x = FMath::Sin(phi) * FMath::Cos(theta);
+            float z = FMath::Sin(phi) * FMath::Sin(theta);
+            Vertices.Emplace(FVector(x, y, z));
+        }
+    }
+
+    int bottomHemisphereStart = Vertices.Num() - (NumRings / 2 + 1) * (NumSegments + 1);
+
+    // 인덱스 생성
+
+    // 1. 상단 반구 삼각형
+    for (int ring = 0; ring < NumRings / 2; ++ring)
+    {
+        for (int seg = 0; seg < NumSegments; ++seg)
+        {
+            int curr = ring * (NumSegments + 1) + seg;
+            int next = (ring + 1) * (NumSegments + 1) + seg;
+
+            Indices.Add(curr);
+            Indices.Add(next);
+            Indices.Add(curr + 1);
+
+            Indices.Add(next);
+            Indices.Add(next + 1);
+            Indices.Add(curr + 1);
+        }
+    }
+
+    // 2. 실린더 옆면
+    int topRingStart = (NumRings / 2) * (NumSegments + 1);
+    int botRingStart = topRingStart + NumSegments + 1;
+    for (int seg = 0; seg < NumSegments; ++seg)
+    {
+        int top0 = topRingStart + seg;
+        int top1 = topRingStart + seg + 1;
+        int bot0 = botRingStart + seg;
+        int bot1 = botRingStart + seg + 1;
+
+        Indices.Add(top0);
+        Indices.Add(bot0);
+        Indices.Add(top1);
+
+        Indices.Add(top1);
+        Indices.Add(bot0);
+        Indices.Add(bot1);
+    }
+
+    // 3. 하단 반구 삼각형
+    int bottomStart = Vertices.Num() - (NumRings / 2 + 1) * (NumSegments + 1);
+    for (int ring = 0; ring < NumRings / 2; ++ring)
+    {
+        int ringOffset = bottomStart + ring * (NumSegments + 1);
+        int nextRingOffset = bottomStart + (ring + 1) * (NumSegments + 1);
+        for (int seg = 0; seg < NumSegments; ++seg)
+        {
+            int curr = ringOffset + seg;
+            int next = nextRingOffset + seg;
+
+            Indices.Add(curr);
+            Indices.Add(next);
+            Indices.Add(curr + 1);
+
+            Indices.Add(next);
+            Indices.Add(next + 1);
+            Indices.Add(curr + 1);
+        }
+    }
+    FVertexInfo SphereVertexInfo;
+    BufferManager->CreateVertexBuffer<FVector>("OverlayCapsuleVertexBuffer", Vertices, SphereVertexInfo, D3D11_USAGE_IMMUTABLE, 0);
+    FIndexInfo SphereIndexInfo;
+    BufferManager->CreateIndexBuffer<uint32>("OverlayCapsuleIndexBuffer", Indices, SphereIndexInfo, D3D11_USAGE_IMMUTABLE, 0);
 }
 
 void FOverlayShapeRenderPass::CreateConstants()
