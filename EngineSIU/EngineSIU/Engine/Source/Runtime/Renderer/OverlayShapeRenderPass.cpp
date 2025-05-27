@@ -93,13 +93,19 @@ void FOverlayShapeRenderPass::PrepareRenderArr()
 {
     ClearRenderArr();
     
-    Spheres.Add(TPair<Shape::FSphere, FLinearColor>(Shape::FSphere(FVector(0, 0, 0), 10.f), FLinearColor(1,0,0,0.2)));
-    Spheres.Add(TPair<Shape::FSphere, FLinearColor>(Shape::FSphere(FVector(0, 0, 5), 10.f), FLinearColor(1,0,0,0.2)));
-    Spheres.Add(TPair<Shape::FSphere, FLinearColor>(Shape::FSphere(FVector(0, 0, 10), 10.f), FLinearColor(1,0,0,0.2)));
+    // test codes
+    //Spheres.Add(TPair<Shape::FSphere, FLinearColor>(Shape::FSphere(FVector(0, 0, 0), 10.f), FLinearColor(1,0,0,0.2)));
+    //Spheres.Add(TPair<Shape::FSphere, FLinearColor>(Shape::FSphere(FVector(0, 0, 5), 10.f), FLinearColor(1,0,0,0.2)));
+    //Spheres.Add(TPair<Shape::FSphere, FLinearColor>(Shape::FSphere(FVector(0, 0, 10), 10.f), FLinearColor(1,0,0,0.2)));
 
-    Capsules.Add(TPair<Shape::FCapsule, FLinearColor>(Shape::FCapsule(FVector(0, 0, 0), FVector(10,10,10), 5), FLinearColor(0, 1, 0, 0.2)));
+    //Capsules.Add(TPair<Shape::FCapsule, FLinearColor>(Shape::FCapsule(FVector(0, 0, 0), FVector(10,10,10), 5), FLinearColor(0, 1, 0, 0.2)));
     //Capsules.Add(TPair<Shape::FCapsule, FLinearColor>(Shape::FCapsule(FVector(5, 0, 0), FVector(15,0,0), 3), FLinearColor(0, 1, 0, 0.2)));
     //Capsules.Add(TPair<Shape::FCapsule, FLinearColor>(Shape::FCapsule(FVector(10, 0, 0), FVector(20,0,0), 3), FLinearColor(0, 1, 0, 0.2)));
+
+    //OrientedBoxes.Add(TPair<Shape::FOrientedBox, FLinearColor>(
+    //    Shape::FOrientedBox(FVector(1, 1, 0), FVector(-1, 1, 0), FVector(0, 0, 1), FVector(3,3,3), 11,22,33),
+    //    FLinearColor(0, 0, 1, 0.2)
+    //));
 
 }
 
@@ -157,6 +163,35 @@ void FOverlayShapeRenderPass::Render(const std::shared_ptr<FEditorViewportClient
         );
     }
 
+    // OrientedBox
+    {
+        TArray<Constants::OrientedBox> OrientedBoxConstants;
+        OrientedBoxConstants.SetNum(OrientedBoxes.Num());
+        for (int Index = 0; Index < OrientedBoxes.Num(); ++Index)
+        {
+            const Shape::FOrientedBox OrientedBox = OrientedBoxes[Index].Key;
+            const FLinearColor Color = OrientedBoxes[Index].Value;
+            OrientedBoxConstants[Index].AxisX = OrientedBox.AxisX;
+            OrientedBoxConstants[Index].ExtentX = OrientedBox.ExtentX;
+            OrientedBoxConstants[Index].AxisY = OrientedBox.AxisY;
+            OrientedBoxConstants[Index].ExtentY = OrientedBox.ExtentY;
+            OrientedBoxConstants[Index].AxisZ = OrientedBox.AxisZ;
+            OrientedBoxConstants[Index].ExtentZ = OrientedBox.ExtentZ;
+            OrientedBoxConstants[Index].Center = OrientedBox.Center;
+            OrientedBoxConstants[Index].Color = Color;
+        }
+        RenderShapeArray(
+            OrientedBoxConstants,
+            L"OverlayShapeVertexShaderOrientedBox",
+            L"OverlayShapePixelShaderOrientedBox",
+            L"OverlayBoxVertexBuffer", // Box랑 공유
+            L"OverlayBoxIndexBuffer",
+            "OrientedBoxConstantBuffer",
+            11,
+            ConstantBufferSize
+        );
+    }
+
     // 박스, 플레인 등도 동일하게 사용 가능
 
     EndRender(Viewport);
@@ -185,6 +220,8 @@ void FOverlayShapeRenderPass::CreateShaders()
     ShaderManager->AddVertexShaderAndInputLayoutAsync(L"OverlayShapeVertexShaderCapsule", L"Shaders/OverlayShapeShader.hlsl", "CapsuleVS", PositionOnly, 1, nullptr);
     ShaderManager->AddPixelShaderAsync(L"OverlayShapePixelShaderCapsule", L"Shaders/OverlayShapeShader.hlsl", "CapsulePS", nullptr);
 
+    ShaderManager->AddVertexShaderAndInputLayoutAsync(L"OverlayShapeVertexShaderOrientedBox", L"Shaders/OverlayShapeShader.hlsl", "OrientedBoxVS", PositionOnly, 1, nullptr);
+    ShaderManager->AddPixelShaderAsync(L"OverlayShapePixelShaderOrientedBox", L"Shaders/OverlayShapeShader.hlsl", "OrientedBoxPS", nullptr);
 }
 
 void FOverlayShapeRenderPass::CreateBlendState()
@@ -214,6 +251,7 @@ void FOverlayShapeRenderPass::CreateBuffers()
 {
     CreateSphereBuffer(32, 32);
     CreateCapsuleBuffer(32, 32);
+    CreateBoxBuffer();
 }
 
 void FOverlayShapeRenderPass::CreateSphereBuffer(int NumSegments, int NumRings)
@@ -378,6 +416,54 @@ void FOverlayShapeRenderPass::CreateCapsuleBuffer(int NumSegments, int NumRings)
     BufferManager->CreateVertexBuffer<FVector>("OverlayCapsuleVertexBuffer", Vertices, SphereVertexInfo, D3D11_USAGE_IMMUTABLE, 0);
     FIndexInfo SphereIndexInfo;
     BufferManager->CreateIndexBuffer<uint32>("OverlayCapsuleIndexBuffer", Indices, SphereIndexInfo, D3D11_USAGE_IMMUTABLE, 0);
+}
+
+void FOverlayShapeRenderPass::CreateBoxBuffer()
+{
+    //TArray<FVector> Vertices;
+    TArray<uint32> Indices;
+
+    // 지금 사실 안씀...
+    //// 8개의 꼭짓점 (좌표: -1~+1, 중심 기준)
+    //Vertices.Add(FVector(-1, -1, -1)); // 0
+    //Vertices.Add(FVector(+1, -1, -1)); // 1
+    //Vertices.Add(FVector(+1, +1, -1)); // 2
+    //Vertices.Add(FVector(-1, +1, -1)); // 3
+    //Vertices.Add(FVector(-1, -1, +1)); // 4
+    //Vertices.Add(FVector(+1, -1, +1)); // 5
+    //Vertices.Add(FVector(+1, +1, +1)); // 6
+    //Vertices.Add(FVector(-1, +1, +1)); // 7
+
+    // 12개의 삼각형(2개 per face), 36개의 인덱스
+    // 각 면은 시계/반시계 방향으로 구성 (Unreal은 기본적으로 Counter-Clockwise winding)
+    uint32 indices[] = {
+        // -Z (아래)
+        0, 3, 1,
+        0, 2, 3,
+        // +Z (위)
+        4, 5, 7,
+        4, 7, 6,
+        // -X (왼쪽)
+        0, 4, 6,
+        0, 6, 2,
+        // +X (오른쪽)
+        1, 3, 7,
+        1, 7, 5,
+        // -Y (뒤)
+        0, 1, 5,
+        0, 5, 4,
+        // +Y (앞)
+        2, 6, 7,
+        2, 7, 3
+    };
+    for (int i = 0; i < 36; ++i)
+    {
+        Indices.Add(indices[i]);
+    }
+    //FVertexInfo VertexInfo;
+    //BufferManager->CreateVertexBuffer<FVector>("OverlayBoxVertexBuffer", Vertices, VertexInfo, D3D11_USAGE_IMMUTABLE);
+    FIndexInfo IndexInfo;
+    BufferManager->CreateIndexBuffer<uint32>("OverlayBoxIndexBuffer", Indices, IndexInfo);
 }
 
 void FOverlayShapeRenderPass::CreateConstants()

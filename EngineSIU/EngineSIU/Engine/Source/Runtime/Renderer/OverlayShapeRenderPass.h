@@ -24,6 +24,7 @@ private:
 
     void CreateSphereBuffer(int NumSegments, int NumRings);
     void CreateCapsuleBuffer(int NumSegments, int NumRings);
+    void CreateBoxBuffer();
 
     void CreateConstants();
 

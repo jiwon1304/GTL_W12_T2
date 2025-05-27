@@ -155,3 +155,87 @@ float4 CapsulePS(PS_INPUT input) : SV_Target
 {
     return input.color;
 }
+
+struct FOrientedBox
+{
+    float3 AxisX;
+    float ExtentX;
+    float3 AxisY;
+    float ExtentY;
+    float3 AxisZ;
+    float ExtentZ;
+    float3 Center;
+    float Pad0;
+    float4 Color;
+};
+
+cbuffer OrientedBoxConstants : register(b11)
+{
+    FOrientedBox OrientedBoxes[512];
+}
+
+//// 8개 박스 버텍스의 로컬 좌표를 하드코딩 (vertexID 기반)
+//float3 GetBoxVertexPosition(uint vertexID)
+//{
+//    // vertexID: 0~7
+//    // -1 또는 +1로 각 축의 꼭짓점을 할당
+//    // vertex 순서 예시: (Unreal Engine DrawDebugBox 참고)
+//    // 0: (-1, -1, -1)
+//    // 1: (+1, -1, -1)
+//    // 2: (+1, +1, -1)
+//    // 3: (-1, +1, -1)
+//    // 4: (-1, -1, +1)
+//    // 5: (+1, -1, +1)
+//    // 6: (+1, +1, +1)
+//    // 7: (-1, +1, +1)
+//    float3 verts[8] =
+//    {
+//        float3(-1, -1, -1),
+//        float3(+1, -1, -1),
+//        float3(+1, +1, -1),
+//        float3(-1, +1, -1),
+//        float3(-1, -1, +1),
+//        float3(+1, -1, +1),
+//        float3(+1, +1, +1),
+//        float3(-1, +1, +1)
+//    };
+//    return verts[vertexID % 8];
+//}
+
+
+float3 GetOrientedBoxVertex(uint vertexID, FOrientedBox box)
+{
+    // vertexID: 0~7
+    float signX = ((vertexID >> 0) & 1) ? 1.0f : -1.0f;
+    float signY = ((vertexID >> 1) & 1) ? 1.0f : -1.0f;
+    float signZ = ((vertexID >> 2) & 1) ? 1.0f : -1.0f;
+
+    return box.Center +
+           signX * box.AxisX * box.ExtentX +
+           signY * box.AxisY * box.ExtentY +
+           signZ * box.AxisZ * box.ExtentZ;
+}
+
+PS_INPUT OrientedBoxVS(VS_INPUT_POS_ONLY input, uint vertexID : SV_VertexID, uint instanceID : SV_InstanceID)
+{
+    PS_INPUT output;
+
+    FOrientedBox box = OrientedBoxes[instanceID];
+    box.AxisX = float3(1, 0, 0);
+    box.AxisY = float3(0, 1, 0);
+    box.AxisZ = float3(0, 0, 1);
+    // CalcVertices와 동일하게 vertexID로 꼭짓점 위치 계산
+    float3 worldPos = GetOrientedBoxVertex(vertexID % 8, box);
+
+    float4 clipPos = mul(float4(worldPos, 1.0f), ViewMatrix);
+    clipPos = mul(clipPos, ProjectionMatrix);
+
+    output.position = clipPos;
+    output.color = box.Color;
+    return output;
+}
+
+float4 OrientedBoxPS(PS_INPUT input) : SV_Target
+{
+    return input.color;
+}

@@ -23,6 +23,7 @@ void FPhysicsAssetViewerRenderPass::Initialize(FDXDBufferManager* InBufferManage
 void FPhysicsAssetViewerRenderPass::PrepareRenderArr()
 {
     ClearRenderArr();
+    Super::PrepareRenderArr();
 }
 
 void FPhysicsAssetViewerRenderPass::Render(const std::shared_ptr<FEditorViewportClient>& Viewport)
@@ -38,7 +39,19 @@ void FPhysicsAssetViewerRenderPass::Render(const std::shared_ptr<FEditorViewport
     {
         return;
     }
+    
+    RenderSkelComp(SkelComp);
 
+    Super::Render(Viewport);
+}
+
+void FPhysicsAssetViewerRenderPass::ClearRenderArr()
+{
+    Super::ClearRenderArr();
+}
+
+void FPhysicsAssetViewerRenderPass::RenderSkelComp(USkeletalMeshComponent* SkelComp)
+{
     USkeletalMesh* SkeletalMesh = SkelComp->GetSkeletalMeshAsset();
     if (!SkeletalMesh)
     {
@@ -50,49 +63,49 @@ void FPhysicsAssetViewerRenderPass::Render(const std::shared_ptr<FEditorViewport
     {
         return;
     }
-
-    AssetToRenderArr(SkeletalMesh);
-
-    Super::Render(Viewport);
-}
-
-void FPhysicsAssetViewerRenderPass::ClearRenderArr()
-{
-    Super::ClearRenderArr();
-}
-
-void FPhysicsAssetViewerRenderPass::AssetToRenderArr(USkeletalMesh* SkeletalMesh)
-{
     // Bone의 정보 얻기
     const FReferenceSkeleton* ReferenceSkeleton = SkeletalMesh->GetRefSkeleton();
     const TArray<FMeshBoneInfo>& RawBoneInfo = ReferenceSkeleton->GetRawRefBoneInfo();
     const TArray<FTransform>& RefBonePoses = SkeletalMesh->GetRefSkeleton()->GetRawRefBonePose();
 
-    UPhysicsAsset* PhysicsAsset = SkeletalMesh->GetPhysicsAsset();
     for (UBodySetup* BodySetup : PhysicsAsset->BodySetup)
     {
+        FName BoneName = BodySetup->BoneName;
+        int32 BoneIndex = ReferenceSkeleton->FindBoneIndex(BoneName);
+        if (BoneIndex == INDEX_NONE)
+        {
+            continue; // 해당 Bone이 없으면 건너뜀
+        }
+
+        FMatrix InitialMatrix = SkelComp->GetBoneComponentSpaceTransform(BoneIndex).ToMatrixNoScale() 
+            * SkelComp->GetWorldMatrix();
+
+        FVector InitialPosition = InitialMatrix.GetTranslationVector();
+        FQuat InitialRotation = InitialMatrix.ToQuat();
+
+        FTransform InitialTransform(InitialRotation, InitialPosition);
+
         FKAggregateGeom AggGeom = BodySetup->AggGeom;
 
-        //for (const FKSphereElem& SphereElem : AggGeom.SphereElems)
-        //{
-        //    Shape::FSphere Sphere(SphereElem.Center, SphereElem.Radius);
-        //    Spheres.Add(TPair<Shape::FSphere, FLinearColor>(Sphere, FLinearColor(1, 0, 0, 0.2)));
-        //}
-
-        //for (const FKBoxElem& BoxElem : AggGeom.BoxElems)
-        //{
-        //    Shape::FBox Box(BoxElem.Center, BoxElem.X, BoxElem.Y, BoxElem.Z);
-        //    Boxes.Add(TPair<Shape::FBox, FLinearColor>(Box, FLinearColor(0, 1, 0, 0.2)));
-        //}
-
-        for (const FKSphylElem& SphylElem : AggGeom.SphylElems)
+        for (FKSphereElem& SphereElem : AggGeom.SphereElems)
         {
+            SphereElem.Center = InitialPosition;
+            Shape::FSphere Sphere(SphereElem.Center, SphereElem.Radius);
+            Spheres.Add(TPair<Shape::FSphere, FLinearColor>(Sphere, FLinearColor(1, 0, 0, 0.2)));
+        }
+
+        for (FKBoxElem& BoxElem : AggGeom.BoxElems)
+        {
+            BoxElem.SetTransform(InitialTransform);
+            Shape::FOrientedBox OrientedBox = BoxElem.ToFOrientedBox();
+            OrientedBoxes.Add(TPair<Shape::FOrientedBox, FLinearColor>(OrientedBox, FLinearColor(0, 1, 0, 0.2)));
+        }
+
+        for (FKSphylElem& SphylElem : AggGeom.SphylElems)
+        {
+            SphylElem.SetTransform(InitialTransform);
             Shape::FCapsule Capsule = SphylElem.ToFCapsule();
-            Capsules.Add(TPair<Shape::FCapsule, FLinearColor>(Capsule, FLinearColor(0, 0, 1, 0.5)));
-            Spheres.Add(TPair<Shape::FSphere, FLinearColor>(
-                Shape::FSphere(Capsule.A, Capsule.Radius), FLinearColor(1, 0, 0, 0.5)));
-            Spheres.Add(TPair<Shape::FSphere, FLinearColor>(
-                Shape::FSphere(Capsule.B, Capsule.Radius), FLinearColor(1, 0, 0, 0.5)));
+            Capsules.Add(TPair<Shape::FCapsule, FLinearColor>(Capsule, FLinearColor(1, 0, 1, 0.5)));
         }
     }
 }

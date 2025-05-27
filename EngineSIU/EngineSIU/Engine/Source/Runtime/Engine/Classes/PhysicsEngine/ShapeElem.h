@@ -40,7 +40,10 @@ struct FKBoxElem : public FKShapeElem
 {
     DECLARE_STRUCT(FKBoxElem, FKShapeElem)
 
-    FKBoxElem() = default;
+    FKBoxElem()
+    {
+        ShapeType = EAggCollisionShape::Type::Box;
+    }
 
     void SetTransform( const FTransform& InTransform )
     {
@@ -87,13 +90,29 @@ struct FKBoxElem : public FKShapeElem
         Z,
         = 1.f
         )
+
+    Shape::FOrientedBox ToFOrientedBox() const
+    {
+        Shape::FOrientedBox OrientedBox;
+        OrientedBox.Center = Center;
+        OrientedBox.AxisX = Rotation.RotateVector(FVector(1, 0, 0));
+        OrientedBox.AxisY = Rotation.RotateVector(FVector(0, 1, 0));
+        OrientedBox.AxisZ = Rotation.RotateVector(FVector(0, 0, 1));
+        OrientedBox.ExtentX = X;
+        OrientedBox.ExtentY = Y;
+        OrientedBox.ExtentZ = Z;
+        return OrientedBox;
+    }
 };
 
 struct FKSphereElem : public FKShapeElem
 {
     DECLARE_STRUCT(FKSphereElem, FKShapeElem)
 
-    FKSphereElem() = default;
+    FKSphereElem()
+    {
+        ShapeType = EAggCollisionShape::Type::Sphere;
+    }
 
     UPROPERTY(
         EditAnywhere,
@@ -108,6 +127,14 @@ struct FKSphereElem : public FKShapeElem
         Radius,
         = 1.f
         )
+
+    Shape::FSphere ToFSphere() const
+    {
+        Shape::FSphere Sphere;
+        Sphere.Center = Center;
+        Sphere.Radius = Radius;
+        return Sphere;
+    }
 };
 
 // 길이 = 2 * Radius + Length
@@ -115,7 +142,10 @@ struct FKSphylElem : public FKShapeElem
 {
     DECLARE_STRUCT(FKSphylElem, FKShapeElem)
 
-    FKSphylElem() = default;
+    FKSphylElem()
+    {
+        ShapeType = EAggCollisionShape::Type::Sphyl;
+    }
 
     void SetTransform( const FTransform& InTransform )
     {

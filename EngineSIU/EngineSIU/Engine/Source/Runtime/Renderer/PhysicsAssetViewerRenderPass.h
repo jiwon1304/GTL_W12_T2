@@ -1,7 +1,7 @@
 #pragma once
 #include "OverlayShapeRenderPass.h"
 
-class USkeletalMesh;
+class USkeletalMeshComponent;
 
 class FPhysicsAssetViewerRenderPass : public FOverlayShapeRenderPass
 {
@@ -15,5 +15,5 @@ public:
     virtual void ClearRenderArr() override;
 
 private:
-    void AssetToRenderArr(USkeletalMesh* SkeletalMesh);
+    void RenderSkelComp(USkeletalMeshComponent* SkelComp);
 };
