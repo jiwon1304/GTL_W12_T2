@@ -17,7 +17,7 @@
 #include "BlurRenderPass.h"
 #include "CameraEffectRenderPass.h"
 #include "SlateRenderPass.h"
-#include "OverlayShapeRenderPass.h"
+#include "PhysicsAssetViewerRenderPass.h"
 #include "EditorRenderPass.h"
 #include "DepthPrePass.h"
 #include "TileLightCullingPass.h"
@@ -62,7 +62,7 @@ void FRenderer::Initialize(FGraphicsDevice* InGraphics, FDXDBufferManager* InBuf
     FogRenderPass = AddRenderPass<FFogRenderPass>();
     BlurRenderPass = AddRenderPass<FBlurRenderPass>();
     CameraEffectRenderPass = AddRenderPass<FCameraEffectRenderPass>();
-    OverlayShapeRenderPass = AddRenderPass<FOverlayShapeRenderPass>();
+    PhysicsAssetViewerRenderPass = AddRenderPass<FPhysicsAssetViewerRenderPass>();
     EditorRenderPass = AddRenderPass<FEditorRenderPass>();
     
     DepthPrePass = AddRenderPass<FDepthPrePass>();
@@ -385,7 +385,7 @@ void FRenderer::RenderWorldScene(const std::shared_ptr<FEditorViewportClient>& V
     }
 
     {
-        OverlayShapeRenderPass->Render(Viewport);
+        PhysicsAssetViewerRenderPass->Render(Viewport);
     }
 
 }

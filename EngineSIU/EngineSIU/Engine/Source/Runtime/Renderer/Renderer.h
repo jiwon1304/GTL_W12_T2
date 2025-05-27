@@ -44,7 +44,7 @@ class FBlurRenderPass;
 class FCameraEffectRenderPass;
 class FCompositingPass;
 class FSlateRenderPass;
-class FOverlayShapeRenderPass;
+class FPhysicsAssetViewerRenderPass;
 class FEditorRenderPass;
 class FDepthPrePass;
 class FTileLightCullingPass;
@@ -111,7 +111,7 @@ public:
     FFogRenderPass* FogRenderPass = nullptr;
     FBlurRenderPass* BlurRenderPass = nullptr;
     FCameraEffectRenderPass* CameraEffectRenderPass = nullptr;
-    FOverlayShapeRenderPass* OverlayShapeRenderPass = nullptr;
+    FPhysicsAssetViewerRenderPass* PhysicsAssetViewerRenderPass = nullptr;
     FEditorRenderPass* EditorRenderPass = nullptr;
     
     FDepthPrePass* DepthPrePass = nullptr;

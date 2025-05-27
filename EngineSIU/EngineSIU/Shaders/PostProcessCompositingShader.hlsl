@@ -56,22 +56,3 @@ float4 mainPS(PS_Input input) : SV_Target
 
     return result;
 }
-
-//    // PostProcessing Texture 추가
-//float4 BlurColor = BlurTexture.Sample(CompositingSampler, UV);
-
-//    if (FogColor.a == BlurColor.a && BlurColor.a == 0.f)
-//    {
-//        //return float4(1, 1, 1, 1);
-//        return
-//BlurColor;
-//    }
-//    else
-//    {
-//        return float4(1, 1, 1, 1);
-//float alpha = FogColor.a / (FogColor.a + BlurColor.a);
-//float4 FinalColor = (lerp(FogColor.rgb, BlurColor.rgb, alpha), 1.0f);
-//        return
-//FinalColor;
-//    }
-//}

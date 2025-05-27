@@ -43,7 +43,7 @@ private:
     );
 
 
-private:
+protected:
     FDXDBufferManager* BufferManager;
     FGraphicsDevice* Graphics;
     FDXDShaderManager* ShaderManager;
