@@ -1,4 +1,5 @@
 Texture2D FogTexture : register(t103);
+Texture2D BlurTexture : register(t106);
 // PostProcessing 추가 시 Texture 추가 (EShaderSRVSlot)
 
 SamplerState CompositingSampler : register(s0);
@@ -37,8 +38,37 @@ float4 mainPS(PS_Input input) : SV_Target
 {
     float2 UV = input.UV;
     float4 FogColor = FogTexture.Sample(CompositingSampler, UV);
-
+    
+    float4 BlurColor = BlurTexture.Sample(CompositingSampler, UV);
     // PostProcessing Texture 추가
-    float4 FinalColor = FogColor;
+    float4 FinalColor;
+    if (FogColor.a != 0)
+    {
+        float alpha = FogColor.a / (FogColor.a + BlurColor.a);
+        float4 FinalColor = (lerp(FogColor.rgb, BlurColor.rgb, alpha), 1.0f);
+    }
+    else
+    {
+        FinalColor = BlurColor;
+    }
     return FinalColor;
 }
+
+//    // PostProcessing Texture 추가
+//float4 BlurColor = BlurTexture.Sample(CompositingSampler, UV);
+
+//    if (FogColor.a == BlurColor.a && BlurColor.a == 0.f)
+//    {
+//        //return float4(1, 1, 1, 1);
+//        return
+//BlurColor;
+//    }
+//    else
+//    {
+//        return float4(1, 1, 1, 1);
+//float alpha = FogColor.a / (FogColor.a + BlurColor.a);
+//float4 FinalColor = (lerp(FogColor.rgb, BlurColor.rgb, alpha), 1.0f);
+//        return
+//FinalColor;
+//    }
+//}
