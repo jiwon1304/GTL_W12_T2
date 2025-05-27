@@ -59,6 +59,7 @@ void FPostProcessCompositingPass::Render(const std::shared_ptr<FEditorViewportCl
 
     Graphics->DeviceContext->PSSetShaderResources(static_cast<UINT>(EShaderSRVSlot::SRV_Fog), 1, &ViewportResource->GetRenderTarget(EResourceType::ERT_PP_Fog)->SRV);
     Graphics->DeviceContext->PSSetShaderResources(static_cast<UINT>(EShaderSRVSlot::SRV_Blur), 1, &ViewportResource->GetRenderTarget(EResourceType::ERT_PP_Blur)->SRV);
+    Graphics->DeviceContext->PSSetShaderResources(static_cast<UINT>(EShaderSRVSlot::SRV_ShapeOverlay), 1, &ViewportResource->GetRenderTarget(EResourceType::ERT_PP_ShapeOverlay)->SRV);
 
     Graphics->DeviceContext->OMSetRenderTargets(1, &RenderTargetRHI->RTV, nullptr);
 

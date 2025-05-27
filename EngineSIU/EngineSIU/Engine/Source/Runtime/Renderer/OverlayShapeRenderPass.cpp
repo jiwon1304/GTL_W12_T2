@@ -88,13 +88,16 @@ void FOverlayShapeRenderPass::Initialize(FDXDBufferManager* InBufferManager, FGr
     CreateShaders();
     CreateBuffers();
     CreateConstants();
+    CreateBlendState();
 }
 
 void FOverlayShapeRenderPass::PrepareRenderArr()
 {
     ClearRenderArr();
     
-    Spheres.Add(TPair<Shape::FSphere, FLinearColor>(Shape::FSphere(FVector(0, 0, 0), 10.f), FLinearColor(1,0,0,0.5)));
+    Spheres.Add(TPair<Shape::FSphere, FLinearColor>(Shape::FSphere(FVector(0, 0, 0), 10.f), FLinearColor(1,0,0,0.2)));
+    Spheres.Add(TPair<Shape::FSphere, FLinearColor>(Shape::FSphere(FVector(0, 0, 5), 10.f), FLinearColor(1,0,0,0.2)));
+    Spheres.Add(TPair<Shape::FSphere, FLinearColor>(Shape::FSphere(FVector(0, 0, 10), 10.f), FLinearColor(1,0,0,0.2)));
 }
 
 void FOverlayShapeRenderPass::Render(const std::shared_ptr<FEditorViewportClient>& Viewport)
@@ -142,18 +145,14 @@ void FOverlayShapeRenderPass::Render(const std::shared_ptr<FEditorViewportClient
         {
             TArray<Constants::Sphere> SubBuffer;
 
-
             for (int j = 0; j < ConstantBufferSize; ++j)
             {
-                if (BufferIndex < SphereConstants.Num())
-                {
-                    SubBuffer.Add(SphereConstants[BufferIndex]);
-                    ++BufferIndex;
-                }
-                else
+                if (BufferIndex >= SphereConstants.Num())
                 {
                     break;
                 }
+                SubBuffer.Add(SphereConstants[BufferIndex]);
+                ++BufferIndex;
             }
 
             if (SubBuffer.Num() > 0)
@@ -189,24 +188,24 @@ void FOverlayShapeRenderPass::CreateShaders()
 
 void FOverlayShapeRenderPass::CreateBlendState()
 {
-    //// === [1] Alpha Blend State 생성 ===
-    //D3D11_BLEND_DESC BlendDesc = {};
-    //BlendDesc.RenderTarget[0].BlendEnable = TRUE;
-    //BlendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
-    //BlendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
-    //BlendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
-    //BlendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
-    //BlendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
-    //BlendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
-    //BlendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
-    //Graphics->Device->CreateBlendState(&BlendDesc, &AlphaBlendState);
+    // === [1] Alpha Blend State 생성 ===
+    D3D11_BLEND_DESC BlendDesc = {};
+    BlendDesc.RenderTarget[0].BlendEnable = TRUE;
+    BlendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+    BlendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+    BlendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+    BlendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+    BlendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
+    BlendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+    BlendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+    Graphics->Device->CreateBlendState(&BlendDesc, &AlphaBlendState);
 
     // === [2] DepthStencil State (Z-Write Off) 생성 ===
     D3D11_DEPTH_STENCIL_DESC DepthDesc = {};
-    DepthDesc.DepthEnable = false;  
-    //DepthDesc.DepthEnable = TRUE;
-    //DepthDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
-    //DepthDesc.DepthFunc = D3D11_COMPARISON_ALWAYS;
+    //DepthDesc.DepthEnable = false;  
+    DepthDesc.DepthEnable = TRUE;
+    DepthDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+    DepthDesc.DepthFunc = D3D11_COMPARISON_ALWAYS;
     Graphics->Device->CreateDepthStencilState(&DepthDesc, &NoZWriteState);
 }
 
@@ -285,14 +284,14 @@ void FOverlayShapeRenderPass::StartRender(const std::shared_ptr<FEditorViewportC
 
     Graphics->DeviceContext->OMSetRenderTargets(1, &RenderTargetRHI->RTV, DepthStencilRHI->DSV);
 
-    //float BlendFactor[4] = { 0, 0, 0, 0 };
-    //Graphics->DeviceContext->OMSetBlendState(AlphaBlendState, BlendFactor, 0xffffffff);
+    float BlendFactor[4] = { 0, 0, 0, 0 };
+    Graphics->DeviceContext->OMSetBlendState(AlphaBlendState, BlendFactor, 0xffffffff);
     Graphics->DeviceContext->OMSetDepthStencilState(NoZWriteState, 0);
 }
 
 void FOverlayShapeRenderPass::EndRender(const std::shared_ptr<FEditorViewportClient>& Viewport)
 {
-    //Graphics->DeviceContext->OMSetBlendState(nullptr, nullptr, 0xffffffff);
+    Graphics->DeviceContext->OMSetBlendState(nullptr, nullptr, 0xffffffff);
     Graphics->DeviceContext->OMSetDepthStencilState(nullptr, 0);
     Graphics->DeviceContext->OMSetRenderTargets(0, nullptr, nullptr);
 }
