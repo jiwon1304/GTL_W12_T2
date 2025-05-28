@@ -150,7 +150,7 @@ physx::PxActor* FPhysicsSolver::RegisterObject(FPhysScene* InScene, const FBodyI
 
     for (const FKSphylElem& SphylElem : AggGeom.SphylElems)
     {
-        PxCapsuleGeometry CapsuleGeometry(SphylElem.Radius, SphylElem.Length);
+        PxCapsuleGeometry CapsuleGeometry(SphylElem.Radius, SphylElem.Length / 2.f);
         PxShape* NewShape = Physics->createShape(CapsuleGeometry, *FPhysxSolversModule::GetModule()->DefaultMaterial);
         FVector Center = SphylElem.Center;
         FQuat Quat = SphylElem.Rotation.Quaternion();
@@ -180,30 +180,37 @@ physx::PxActor* FPhysicsSolver::RegisterObject(FPhysScene* InScene, const FBodyI
     return NewRigidActor;
 }
 
-physx::PxJoint* FPhysicsSolver::CreateJoint(FPhysScene* InScene, PxActor* Actor1, PxActor* Actor2, const FConstraintInstance* InInstance)
+physx::PxJoint* FPhysicsSolver::CreateJoint(FPhysScene* InScene, PxActor* Child, PxActor* Parent, const FConstraintInstance* NewInstance)
 {
-    PxRigidDynamic* Actor1Dynamic = Actor1->is<PxRigidDynamic>();
-    PxRigidDynamic* Actor2Dynamic = Actor2->is<PxRigidDynamic>();
-    if (!Actor1Dynamic || !Actor2Dynamic)
+    PxRigidDynamic* ParentDynamic = Parent->is<PxRigidDynamic>();
+    PxRigidDynamic* ChildDynamic = Child->is<PxRigidDynamic>();
+    if (!ParentDynamic || !ChildDynamic)
     {
         UE_LOG(ELogLevel::Error, TEXT("Parent or Child is not a dynamic actor!"));
         return nullptr;
     }
-    PxTransform localChildTransform = Actor2Dynamic->getGlobalPose();
-    PxTransform localFrameParent = PxTransform(Actor1Dynamic->getGlobalPose().getInverse() * localChildTransform);
-    PxTransform localFrameChild = PxTransform(PxVec3(0));
+    //PxTransform localChildTransform = Actor2Dynamic->getGlobalPose();
+    //PxTransform localFrameParent = PxTransform(Actor1Dynamic->getGlobalPose().getInverse() * localChildTransform);
+    //PxTransform localFrameChild = PxTransform(PxVec3(0));
 
-    PxD6Joint* Joint = PxD6JointCreate(*FPhysxSolversModule::GetModule()->Physics, Actor1Dynamic, localFrameParent, Actor2Dynamic, localFrameChild);
+    PxTransform parentWorld = ParentDynamic->getGlobalPose();
+    PxTransform childWorld = ChildDynamic->getGlobalPose();
+
+    // 두 객체의 상대 위치 + 회전 차이 모두 포함
+    PxTransform localFrameParent = parentWorld.getInverse() * childWorld;
+    PxTransform localFrameChild(PxIdentity); // 또는 상대적으로 회전을 명시적으로 설정
+
+    PxD6Joint* Joint = PxD6JointCreate(*FPhysxSolversModule::GetModule()->Physics, ParentDynamic, localFrameParent, ChildDynamic, localFrameChild);
 
     // 3. 프로파일 속성 적용
-    const FConstraintProfileProperties& Profile = InInstance->ProfileInstance;
+    const FConstraintProfileProperties& Profile = NewInstance->ProfileInstance;
     const FLinearConstraint& LinearLimitProps = Profile.LinearLimit;
     const FConeConstraint& ConeLimitProps = Profile.ConeLimit;
     const FTwistConstraint& TwistLimitProps = Profile.TwistLimit;
 
-    Joint->setMotion(physx::PxD6Axis::eX, FPhysicsAssetUtils::MapLinearMotionToPx(LinearLimitProps.XMotion));
-    Joint->setMotion(physx::PxD6Axis::eY, FPhysicsAssetUtils::MapLinearMotionToPx(LinearLimitProps.YMotion));
-    Joint->setMotion(physx::PxD6Axis::eZ, FPhysicsAssetUtils::MapLinearMotionToPx(LinearLimitProps.ZMotion));
+    //Joint->setMotion(physx::PxD6Axis::eX, FPhysicsAssetUtils::MapLinearMotionToPx(LinearLimitProps.XMotion));
+    //Joint->setMotion(physx::PxD6Axis::eY, FPhysicsAssetUtils::MapLinearMotionToPx(LinearLimitProps.YMotion));
+    //Joint->setMotion(physx::PxD6Axis::eZ, FPhysicsAssetUtils::MapLinearMotionToPx(LinearLimitProps.ZMotion));
 
     // 선형 제한
     if (LinearLimitProps.XMotion != ELinearConstraintMotion::LCM_Free ||
@@ -239,7 +246,7 @@ physx::PxJoint* FPhysicsSolver::CreateJoint(FPhysScene* InScene, PxActor* Actor1
 
         physx::PxSpring spring(stiffness, damping);
         physx::PxJointLinearLimit limitParams(extentVal, spring);
-        Joint->setLinearLimit(limitParams);
+        //Joint->setLinearLimit(limitParams);
     }
 
     // 각도 제한
@@ -328,8 +335,12 @@ physx::PxJoint* FPhysicsSolver::CreateJoint(FPhysScene* InScene, PxActor* Actor1
         Joint->setTwistLimit(twistLimitParams);
     }
 
+
     // !TODO : Bodysetup단에서 bCollisionEnabled를 가져와서 세팅
-    Joint->setConstraintFlag(physx::PxConstraintFlag::eCOLLISION_ENABLED, !Profile.bDisableCollision);
+    Joint->setConstraintFlag(physx::PxConstraintFlag::eCOLLISION_ENABLED, !Profile.bDisableCollision); 
+#if _DEBUG
+    Joint->setConstraintFlag(physx::PxConstraintFlag::eVISUALIZATION, true);
+#endif
     return Joint;
 }
 
