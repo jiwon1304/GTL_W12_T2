@@ -68,6 +68,7 @@ namespace Constants
         float AngleWidth;
         float AngleHeight;
         float Pad2;
+
         FLinearColor Color;
     };
 }
@@ -111,9 +112,6 @@ void FOverlayShapeRenderPass::PrepareRenderArr()
     //    Shape::FOrientedBox(FVector(1, 1, 0), FVector(-1, 1, 0), FVector(0, 0, 1), FVector(3,3,3), 11,22,33),
     //    FLinearColor(0, 0, 1, 0.2)
     //));
-
-
-
 }
 
 void FOverlayShapeRenderPass::Render(const std::shared_ptr<FEditorViewportClient>& Viewport)
@@ -262,7 +260,6 @@ void FOverlayShapeRenderPass::Render(const std::shared_ptr<FEditorViewportClient
     //        ConstantBufferSize
     //    );
     //}
-
     // 박스, 플레인 등도 동일하게 사용 가능
 
     EndRender(Viewport);

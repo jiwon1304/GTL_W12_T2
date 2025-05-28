@@ -65,7 +65,7 @@ void FPhysicsAssetEditorPanel::Render()
     ImGui::Spacing();
     ImGui::Separator();
 
-    ImGui::BeginChild("Skeletal Tree Id");
+    ImGui::BeginChild("Skeletal Tree Id", ImVec2(0, 0), 0, ImGuiWindowFlags_HorizontalScrollbar);
     RenderSkeletonBoneTree();    // Render Bone, Body, Constraint ...
     ImGui::EndChild();
     ImGui::End();
@@ -117,6 +117,9 @@ void FPhysicsAssetEditorPanel::Render()
     ImGui::Begin("Exit Physics Asset Editor", nullptr, ExitPanelFlags);
     if (ImGui::Button("Exit", ImVec2(ExitPanelWidth, ExitPanelHeight)))
     {
+        USkeletalMesh* SkeletalMesh = EditorEngine->PhysicsAssetEditorWorld->GetSkeletalMeshComponent()->GetSkeletalMeshAsset();
+        UPhysicsAsset* PhysicsAsset = SkeletalMesh->GetPhysicsAsset();
+        UAssetManager::Get().SavePhysicsAssetBinary(PhysicsAsset);
         EditorEngine->EndPhysicsAssetEditor();
     }
     ImGui::End();
@@ -194,7 +197,7 @@ void FPhysicsAssetEditorPanel::RenderAddPrimitiveButton()
                 int32 SelectedPrimitiveIndex = EditorEngine->PhysicsAssetEditorWorld->SelectedPrimitive.SelectedPrimitiveIndex;
                 EAggCollisionShape::Type PrimitiveType = EditorEngine->PhysicsAssetEditorWorld->SelectedPrimitive.PrimitiveType;
         
-                if (SelectedBoneIndex == -1 && SelectedBodySetupIndex == -1 && (SelectedPrimitiveIndex == -1 || ParentBodySetupIndex == -1))
+                if (SelectedBoneIndex == -1 && SelectedBodySetupIndex == -1 && (SelectedPrimitiveIndex == -1 || ParentBodySetupIndex == -1 || PrimitiveType == EAggCollisionShape::Unknown))
                 {
                     continue;
                 }
@@ -380,7 +383,7 @@ void FPhysicsAssetEditorPanel::RenderDetailPanel()
     int32 SelectedPrimitiveIndex = EditorEngine->PhysicsAssetEditorWorld->SelectedPrimitive.SelectedPrimitiveIndex;
     EAggCollisionShape::Type PrimitiveType = EditorEngine->PhysicsAssetEditorWorld->SelectedPrimitive.PrimitiveType;
 
-    if (SelectedBoneIndex == -1 && SelectedBodySetupIndex == -1 && (SelectedPrimitiveIndex == -1 || ParentBodySetupIndex == -1) && SelectedConstraintIndex == -1)
+    if (SelectedBoneIndex == -1 && SelectedBodySetupIndex == -1 && (SelectedPrimitiveIndex == -1 || ParentBodySetupIndex == -1 || PrimitiveType == EAggCollisionShape::Unknown) && SelectedConstraintIndex == -1)
     {
         return;
     }
@@ -656,7 +659,7 @@ void FPhysicsAssetEditorPanel::RenderTreeRecursive(USkeletalMesh* InSkeletalMesh
                         if (ImGui::TreeNodeEx(GetData(GetCleanBoneName(ShapeElem.Name.ToString())), NodeFlags))
                         {
                             bool bIsDelete = false; 
-                            DrawPopupPrimitive(InPhysicsAsset, TargetBodySetup, PrimitiveType, PrimitiveIndex, bIsDelete);
+                            DrawPopupPrimitive(InPhysicsAsset, TargetBodySetup, PrimitiveType, PrimitiveIndex, InBoneIndex, bIsDelete);
 
                             if (!bIsDelete && ImGui::IsItemClicked(ImGuiMouseButton_Left)) // 왼쪽 마우스 버튼 클릭 시
                             {
@@ -682,7 +685,7 @@ void FPhysicsAssetEditorPanel::RenderTreeRecursive(USkeletalMesh* InSkeletalMesh
                         if (ImGui::TreeNodeEx(GetData(GetCleanBoneName(ShapeElem.Name.ToString())), NodeFlags))
                         {
                             bool bIsDelete = false;
-                            DrawPopupPrimitive(InPhysicsAsset, TargetBodySetup, PrimitiveType, PrimitiveIndex, bIsDelete);
+                            DrawPopupPrimitive(InPhysicsAsset, TargetBodySetup, PrimitiveType, PrimitiveIndex, InBoneIndex, bIsDelete);
                             
                             if (!bIsDelete && ImGui::IsItemClicked(ImGuiMouseButton_Left)) // 왼쪽 마우스 버튼 클릭 시
                             {
@@ -708,7 +711,7 @@ void FPhysicsAssetEditorPanel::RenderTreeRecursive(USkeletalMesh* InSkeletalMesh
                         if (ImGui::TreeNodeEx(GetData(GetCleanBoneName(ShapeElem.Name.ToString())), NodeFlags))
                         {
                             bool bIsDelete;
-                            DrawPopupPrimitive(InPhysicsAsset, TargetBodySetup, PrimitiveType, PrimitiveIndex, bIsDelete);
+                            DrawPopupPrimitive(InPhysicsAsset, TargetBodySetup, PrimitiveType, PrimitiveIndex, InBoneIndex, bIsDelete);
                             
                             if (!bIsDelete && ImGui::IsItemClicked(ImGuiMouseButton_Left)) // 왼쪽 마우스 버튼 클릭 시
                             {
@@ -907,12 +910,17 @@ void FPhysicsAssetEditorPanel::DrawPopupBodySetup(UPhysicsAsset* PhysicsAsset, U
             BodySetup->AggGeom.SphereElems.Empty();
             BodySetup->AggGeom.SphylElems.Empty();
 
-            for (UPhysicsConstraintTemplate* ConstraintSetup : PhysicsAsset->ConstraintSetup)
+            TArray<UPhysicsConstraintTemplate*> ConstraintSetups = PhysicsAsset->ConstraintSetup;
+            
+            for (UPhysicsConstraintTemplate* ConstraintSetup : ConstraintSetups)
             {
-                GUObjectArray.MarkRemoveObject(ConstraintSetup);
+                FName BoneName = PhysicsAsset->PreviewSkeletalMesh->GetRefSkeleton()->GetBoneName(InBoneIndex);
+                if (ConstraintSetup->DefaultInstance.ConstraintBone1 == BoneName || ConstraintSetup->DefaultInstance.ConstraintBone2 == BoneName)
+                {
+                    GUObjectArray.MarkRemoveObject(ConstraintSetup);
+                    PhysicsAsset->ConstraintSetup.Remove(ConstraintSetup);
+                }
             }
-
-            PhysicsAsset->ConstraintSetup.Empty();
             
             PhysicsAsset->BodySetup.Remove(BodySetup);
             PhysicsAsset->UpdateBodySetupIndexMap();
@@ -964,7 +972,7 @@ void FPhysicsAssetEditorPanel::DrawPopupBone(UPhysicsAsset* PhysicsAsset, UBodyS
     }
 }
 
-void FPhysicsAssetEditorPanel::DrawPopupPrimitive(UPhysicsAsset* InPhysicsAsset, UBodySetup* InBodySetup, EAggCollisionShape::Type PrimitiveType, uint32 PrimitiveIndex, bool& bIsDelete)
+void FPhysicsAssetEditorPanel::DrawPopupPrimitive(UPhysicsAsset* InPhysicsAsset, UBodySetup* InBodySetup, EAggCollisionShape::Type PrimitiveType, uint32 PrimitiveIndex, int32 InBoneIndex, bool& bIsDelete)
 {
     bIsDelete = false;
     UEditorEngine* EditorEngine = Cast<UEditorEngine>(GEngine);
@@ -1006,12 +1014,17 @@ void FPhysicsAssetEditorPanel::DrawPopupPrimitive(UPhysicsAsset* InPhysicsAsset,
 
             if (InBodySetup->AggGeom.BoxElems.Num() == 0 && InBodySetup->AggGeom.SphereElems.Num() == 0 && InBodySetup->AggGeom.SphylElems.Num() == 0)
             {
-                for (UPhysicsConstraintTemplate* ConstraintSetup : InPhysicsAsset->ConstraintSetup)
+                TArray<UPhysicsConstraintTemplate*> ConstraintSetups = InPhysicsAsset->ConstraintSetup;
+            
+                for (UPhysicsConstraintTemplate* ConstraintSetup : ConstraintSetups)
                 {
-                    GUObjectArray.MarkRemoveObject(ConstraintSetup);
+                    FName BoneName = InPhysicsAsset->PreviewSkeletalMesh->GetRefSkeleton()->GetBoneName(InBoneIndex);
+                    if (ConstraintSetup->DefaultInstance.ConstraintBone1 == BoneName || ConstraintSetup->DefaultInstance.ConstraintBone2 == BoneName)
+                    {
+                        GUObjectArray.MarkRemoveObject(ConstraintSetup);
+                        InPhysicsAsset->ConstraintSetup.Remove(ConstraintSetup);
+                    }
                 }
-
-                InPhysicsAsset->ConstraintSetup.Empty();
                 
                 InPhysicsAsset->BodySetup.Remove(InBodySetup);
                 InPhysicsAsset->UpdateBodySetupIndexMap();
@@ -1120,6 +1133,22 @@ void FPhysicsAssetEditorPanel::AddShape(UPhysicsAsset* InPhysicsAsset, UBodySetu
         FName BoneName = InPhysicsAsset->PreviewSkeletalMesh->GetSkeleton()->GetReferenceSkeleton().GetBoneName(BoneIndex);
         TargetBodySetup = FObjectFactory::ConstructObject<UBodySetup>(InPhysicsAsset);
         TargetBodySetup->BoneName = BoneName;
+
+        int32 BodyIndex = InPhysicsAsset->FindBodyIndex(BoneName);
+
+        TargetBodySetup->CollisionResponse = EBodyCollisionResponse::Type::BodyCollision_Enabled;
+        TargetBodySetup->DefaultInstance.ExternalCollisionProfileBodySetup = TargetBodySetup;
+        TargetBodySetup->DefaultInstance.InstanceBodyIndex = BodyIndex;
+        TargetBodySetup->DefaultInstance.InstanceBoneIndex = BoneIndex;
+
+        FPhysicsMaterial* PhysicsMaterial = new FPhysicsMaterial();
+        PhysicsMaterial->Density = 1000.f; // 임시 밀도 값
+
+        // !TODO : 디폴트 머티리얼을 하나 만들어두고 그걸 사용하도록 해야 함
+        UPhysicalMaterial* PhysMaterial = FObjectFactory::ConstructObject<UPhysicalMaterial>(nullptr);
+        PhysMaterial->Material = PhysicsMaterial;
+
+        TargetBodySetup->PhysMaterial = PhysMaterial;
         InPhysicsAsset->BodySetup.Add(TargetBodySetup);
         InPhysicsAsset->UpdateBodySetupIndexMap();
     }
