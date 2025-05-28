@@ -463,40 +463,42 @@ void AEditorPlayer::ControlPickedPhysicsAsset(FVector2D DeltaPoint)
             FMatrix TargetBone = GlobalBoneMatrices[BoneIndex];
             FTransform WorldBoneTransform = WorldTransform * FTransform(TargetBone.GetMatrixWithoutScale());
             
-            FTransform TargetTransform = WorldBoneTransform;
+            FTransform PrimitiveTargetTransform = WorldBoneTransform;
 
             if (TargetPrimitiveType == EAggCollisionShape::Sphere)
             {
                 FKSphereElem SphereElem = *static_cast<FKSphereElem*>(TargetAggregateGeom);
-                FVector NewLocation = TargetTransform.TransformDirection(SphereElem.Center);
-                TargetTransform.AddToTranslation(NewLocation);
-                TargetTransform.Scale3D *= SphereElem.Radius;
+                FVector NewLocation = PrimitiveTargetTransform.TransformDirection(SphereElem.Center);
+                PrimitiveTargetTransform.AddToTranslation(NewLocation);
+                PrimitiveTargetTransform.Scale3D *= SphereElem.Radius;
             }
             else if (TargetPrimitiveType == EAggCollisionShape::Box)
             {
                 FKBoxElem BoxElem = *static_cast<FKBoxElem*>(TargetAggregateGeom);
-                FVector NewLocation = TargetTransform.TransformDirection(BoxElem.Center);
-                TargetTransform.AddToTranslation(NewLocation);
-                TargetTransform.Rotation = BoxElem.Rotation.Quaternion() * TargetTransform.Rotation;
-                TargetTransform.Scale3D *= FVector(BoxElem.X, BoxElem.Y, BoxElem.Z);
+                FVector NewLocation = PrimitiveTargetTransform.TransformDirection(BoxElem.Center);
+                PrimitiveTargetTransform.AddToTranslation(NewLocation);
+                PrimitiveTargetTransform.Rotation = BoxElem.Rotation.Quaternion() * PrimitiveTargetTransform.Rotation;
+                PrimitiveTargetTransform.Scale3D *= FVector(BoxElem.X, BoxElem.Y, BoxElem.Z);
             }
             else if (TargetPrimitiveType == EAggCollisionShape::Sphyl)
             {
                 FKSphylElem SphylElem = *static_cast<FKSphylElem*>(TargetAggregateGeom);
-                FVector NewLocation = TargetTransform.TransformDirection(SphylElem.Center);
-                TargetTransform.AddToTranslation(NewLocation);
-                TargetTransform.Rotation = SphylElem.Rotation.Quaternion() * TargetTransform.Rotation;
-                TargetTransform.Scale3D.X *= SphylElem.Length / 2;
-                TargetTransform.Scale3D.Y *= SphylElem.Radius;
-                TargetTransform.Scale3D.Z *= SphylElem.Radius;
+                FVector NewLocation = PrimitiveTargetTransform.TransformDirection(SphylElem.Center);
+                PrimitiveTargetTransform.AddToTranslation(NewLocation);
+                PrimitiveTargetTransform.Rotation = SphylElem.Rotation.Quaternion() * PrimitiveTargetTransform.Rotation;
+                PrimitiveTargetTransform.Scale3D.X *= SphylElem.Length / 2;
+                PrimitiveTargetTransform.Scale3D.Y *= SphylElem.Radius;
+                PrimitiveTargetTransform.Scale3D.Z *= SphylElem.Radius;
             }
 
             switch (ControlMode)
             {
             case CM_TRANSLATION:
             {
-                ControlTranslation(TargetTransform, Gizmo, DeltaPoint.X, DeltaPoint.Y);
-                FTransform NewTransform = TargetTransform * WorldBoneTransform.Inverse();
+                FTransform ControlTransform = PrimitiveTargetTransform;
+                ControlTranslation(ControlTransform, Gizmo, DeltaPoint.X, DeltaPoint.Y);
+                
+                FTransform NewTransform = ControlTransform * PrimitiveTargetTransform.Inverse();
 
                 if (TargetPrimitiveType == EAggCollisionShape::Sphere)
                 {
@@ -521,8 +523,10 @@ void AEditorPlayer::ControlPickedPhysicsAsset(FVector2D DeltaPoint)
                 {
                     int a = 0;
                 }
-                ControlScale(TargetTransform, Gizmo, DeltaPoint.X, DeltaPoint.Y);
-                FTransform NewTransform = TargetTransform * WorldBoneTransform.Inverse();
+                FTransform ControlTransform = PrimitiveTargetTransform;
+                ControlScale(ControlTransform, Gizmo, DeltaPoint.X, DeltaPoint.Y);
+                
+                FTransform NewTransform = ControlTransform * PrimitiveTargetTransform.Inverse();
 
                 if (TargetPrimitiveType == EAggCollisionShape::Sphere)
                 {
@@ -553,16 +557,18 @@ void AEditorPlayer::ControlPickedPhysicsAsset(FVector2D DeltaPoint)
                 break;
             case CM_ROTATION:
             {
+                FTransform ControlTransform = PrimitiveTargetTransform;
                 if (TargetPrimitiveType == EAggCollisionShape::Box)
                 {
-                    ControlRotation(TargetTransform, Gizmo, DeltaPoint.X, DeltaPoint.Y);
+                    ControlRotation(ControlTransform, Gizmo, DeltaPoint.X, DeltaPoint.Y);
                 }
                 else if (TargetPrimitiveType == EAggCollisionShape::Sphyl)
                 {
-                    ControlRotation(TargetTransform, Gizmo, DeltaPoint.X, DeltaPoint.Y);
+                    ControlRotation(ControlTransform, Gizmo, DeltaPoint.X, DeltaPoint.Y);
                 }
                 
-                FTransform NewTransform = TargetTransform * WorldBoneTransform.Inverse();
+                FTransform NewTransform = ControlTransform * PrimitiveTargetTransform.Inverse();
+                
                 if (TargetPrimitiveType == EAggCollisionShape::Box)
                 {
                     FKBoxElem& BoxElem = *static_cast<FKBoxElem*>(TargetAggregateGeom);
