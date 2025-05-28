@@ -114,7 +114,7 @@ void AEditorPlayer::Input()
             else if (Engine->ActiveWorld->WorldType == EWorldType::PhysicsAssetEditor)
             {
                 PickedBoneControl(DeltaPoint);
-                ControlPickedPhysicsAsset(DeltaPoint);
+                // ControlPickedPhysicsAsset(DeltaPoint);
             }
             LastMousePos = CurrentMousePos;
         }
@@ -458,62 +458,67 @@ void AEditorPlayer::ControlPickedPhysicsAsset(FVector2D DeltaPoint)
             }
             
             TArray<FMatrix> GlobalBoneMatrices;
-            SkeletalMeshComp->GetCurrentGlobalBoneMatrices(GlobalBoneMatrices);
-            int32 BoneIndex = SkeletalMesh->GetRefSkeleton()->FindBoneIndex(TargetBodySetup->BoneName); 
-            FMatrix TargetBone = GlobalBoneMatrices[BoneIndex];
-            FTransform WorldBoneTransform = WorldTransform * FTransform(TargetBone.GetMatrixWithoutScale());
+            int32 BoneIndex = SkeletalMesh->GetRefSkeleton()->FindBoneIndex(TargetBodySetup->BoneName);
+            FTransform TargetBoneTransform = SkeletalMeshComp->GetBoneComponentSpaceTransform(BoneIndex);
+            FTransform WorldBoneTransform = TargetBoneTransform * WorldTransform;
             
-            FTransform PrimitiveTargetTransform = WorldBoneTransform;
+            FTransform GeomLocalTransform = FTransform::Identity;
 
             if (TargetPrimitiveType == EAggCollisionShape::Sphere)
             {
                 FKSphereElem SphereElem = *static_cast<FKSphereElem*>(TargetAggregateGeom);
-                FVector NewLocation = PrimitiveTargetTransform.TransformDirection(SphereElem.Center);
-                PrimitiveTargetTransform.AddToTranslation(NewLocation);
-                PrimitiveTargetTransform.Scale3D *= SphereElem.Radius;
+                FVector NewLocation = WorldBoneTransform.TransformDirection(SphereElem.Center);
+                GeomLocalTransform.AddToTranslation(NewLocation);
+                GeomLocalTransform.Scale3D *= SphereElem.Radius;
             }
             else if (TargetPrimitiveType == EAggCollisionShape::Box)
             {
                 FKBoxElem BoxElem = *static_cast<FKBoxElem*>(TargetAggregateGeom);
-                FVector NewLocation = PrimitiveTargetTransform.TransformDirection(BoxElem.Center);
-                PrimitiveTargetTransform.AddToTranslation(NewLocation);
-                PrimitiveTargetTransform.Rotation = BoxElem.Rotation.Quaternion() * PrimitiveTargetTransform.Rotation;
-                PrimitiveTargetTransform.Scale3D *= FVector(BoxElem.X, BoxElem.Y, BoxElem.Z);
+                FVector NewLocation = WorldBoneTransform.TransformDirection(BoxElem.Center);
+                GeomLocalTransform.AddToTranslation(NewLocation);
+                GeomLocalTransform.Rotation = BoxElem.Rotation.Quaternion() * GeomLocalTransform.Rotation;
+                GeomLocalTransform.Scale3D *= FVector(BoxElem.X, BoxElem.Y, BoxElem.Z);
             }
             else if (TargetPrimitiveType == EAggCollisionShape::Sphyl)
             {
                 FKSphylElem SphylElem = *static_cast<FKSphylElem*>(TargetAggregateGeom);
-                FVector NewLocation = PrimitiveTargetTransform.TransformDirection(SphylElem.Center);
-                PrimitiveTargetTransform.AddToTranslation(NewLocation);
-                PrimitiveTargetTransform.Rotation = SphylElem.Rotation.Quaternion() * PrimitiveTargetTransform.Rotation;
-                PrimitiveTargetTransform.Scale3D.X *= SphylElem.Length / 2;
-                PrimitiveTargetTransform.Scale3D.Y *= SphylElem.Radius;
-                PrimitiveTargetTransform.Scale3D.Z *= SphylElem.Radius;
+                FVector NewLocation = WorldBoneTransform.TransformDirection(SphylElem.Center);
+                GeomLocalTransform.AddToTranslation(NewLocation);
+                GeomLocalTransform.Rotation = SphylElem.Rotation.Quaternion() * GeomLocalTransform.Rotation;
+                GeomLocalTransform.Scale3D.X *= SphylElem.Length / 2;
+                GeomLocalTransform.Scale3D.Y *= SphylElem.Radius;
+                GeomLocalTransform.Scale3D.Z *= SphylElem.Radius;
             }
 
             switch (ControlMode)
             {
             case CM_TRANSLATION:
             {
-                FTransform ControlTransform = PrimitiveTargetTransform;
-                ControlTranslation(ControlTransform, Gizmo, DeltaPoint.X, DeltaPoint.Y);
+                FTransform NewIdentity = WorldBoneTransform * WorldBoneTransform.Inverse();
+                FTransform Test = GeomLocalTransform * WorldBoneTransform * WorldBoneTransform.Inverse();
+                // ComponentSpace * WorldSpace
+                FTransform GeomWorldTransform = GeomLocalTransform * WorldBoneTransform;
+
+                FTransform TargetTransform = GeomWorldTransform;
                 
-                FTransform NewTransform = ControlTransform * PrimitiveTargetTransform.Inverse();
+                ControlTranslation(TargetTransform, Gizmo, DeltaPoint.X, DeltaPoint.Y);
+                
+                FTransform NewGeomTransform = TargetTransform * WorldBoneTransform.Inverse();
 
                 if (TargetPrimitiveType == EAggCollisionShape::Sphere)
                 {
                     FKSphereElem& SphereElem = *static_cast<FKSphereElem*>(TargetAggregateGeom);
-                    SphereElem.Center = NewTransform.GetTranslation();
+                    SphereElem.Center = NewGeomTransform.GetTranslation();
                 }
                 else if (TargetPrimitiveType == EAggCollisionShape::Box)
                 {
                     FKBoxElem& BoxElem = *static_cast<FKBoxElem*>(TargetAggregateGeom);
-                    BoxElem.Center = NewTransform.GetTranslation();
+                    BoxElem.Center = NewGeomTransform.GetTranslation();
                 }
                 else if (TargetPrimitiveType == EAggCollisionShape::Sphyl)
                 {
                     FKSphylElem& SphylElem = *static_cast<FKSphylElem*>(TargetAggregateGeom);
-                    SphylElem.Center = NewTransform.GetTranslation();
+                    SphylElem.Center = NewGeomTransform.GetTranslation();
                 }
                 break;
             }
@@ -523,61 +528,62 @@ void AEditorPlayer::ControlPickedPhysicsAsset(FVector2D DeltaPoint)
                 {
                     int a = 0;
                 }
-                FTransform ControlTransform = PrimitiveTargetTransform;
-                ControlScale(ControlTransform, Gizmo, DeltaPoint.X, DeltaPoint.Y);
-                
-                FTransform NewTransform = ControlTransform * PrimitiveTargetTransform.Inverse();
+                FTransform GeomWorldTransform = GeomLocalTransform * WorldBoneTransform;
+                ControlScale(GeomWorldTransform, Gizmo, DeltaPoint.X, DeltaPoint.Y);
+
+                FTransform NewGeomTransform = GeomWorldTransform * WorldBoneTransform.Inverse();
 
                 if (TargetPrimitiveType == EAggCollisionShape::Sphere)
                 {
                     FKSphereElem& SphereElem = *static_cast<FKSphereElem*>(TargetAggregateGeom);
-                    if (SphereElem.Radius < NewTransform.Scale3D.GetMax())
+                    if (SphereElem.Radius < NewGeomTransform.Scale3D.GetMax())
                     {
-                        SphereElem.Radius = NewTransform.Scale3D.GetMax();
+                        SphereElem.Radius = NewGeomTransform.Scale3D.GetMax();
                     }
-                    else if (SphereElem.Radius > NewTransform.Scale3D.GetMin())
+                    else if (SphereElem.Radius > NewGeomTransform.Scale3D.GetMin())
                     {
-                        SphereElem.Radius = NewTransform.Scale3D.GetMin();
+                        SphereElem.Radius = NewGeomTransform.Scale3D.GetMin();
                     }
                 }
                 else if (TargetPrimitiveType == EAggCollisionShape::Box)
                 {
                     FKBoxElem& BoxElem = *static_cast<FKBoxElem*>(TargetAggregateGeom);
-                    BoxElem.X = NewTransform.Scale3D.X;
-                    BoxElem.Y = NewTransform.Scale3D.Y;
-                    BoxElem.Z = NewTransform.Scale3D.Z;
+                    BoxElem.X = NewGeomTransform.Scale3D.X;
+                    BoxElem.Y = NewGeomTransform.Scale3D.Y;
+                    BoxElem.Z = NewGeomTransform.Scale3D.Z;
                 }
                 else if (TargetPrimitiveType == EAggCollisionShape::Sphyl)
                 {
                     FKSphylElem& SphylElem = *static_cast<FKSphylElem*>(TargetAggregateGeom);
-                    SphylElem.Length = NewTransform.Scale3D.X / 2;
-                    SphylElem.Radius = FMath::Max(NewTransform.Scale3D.Y, NewTransform.Scale3D.X);
+                    SphylElem.Length = NewGeomTransform.Scale3D.X / 2;
+                    SphylElem.Radius = FMath::Max(NewGeomTransform.Scale3D.Y, NewGeomTransform.Scale3D.X);
                 }
             }
                 break;
             case CM_ROTATION:
             {
-                FTransform ControlTransform = PrimitiveTargetTransform;
+                FTransform GeomWorldTransform = GeomLocalTransform * WorldBoneTransform;
+
                 if (TargetPrimitiveType == EAggCollisionShape::Box)
                 {
-                    ControlRotation(ControlTransform, Gizmo, DeltaPoint.X, DeltaPoint.Y);
+                    ControlRotation(GeomWorldTransform, Gizmo, DeltaPoint.X, DeltaPoint.Y);
                 }
                 else if (TargetPrimitiveType == EAggCollisionShape::Sphyl)
                 {
-                    ControlRotation(ControlTransform, Gizmo, DeltaPoint.X, DeltaPoint.Y);
+                    ControlRotation(GeomWorldTransform, Gizmo, DeltaPoint.X, DeltaPoint.Y);
                 }
                 
-                FTransform NewTransform = ControlTransform * PrimitiveTargetTransform.Inverse();
+                FTransform NewGeomTransform = GeomWorldTransform * WorldBoneTransform.Inverse();
                 
                 if (TargetPrimitiveType == EAggCollisionShape::Box)
                 {
                     FKBoxElem& BoxElem = *static_cast<FKBoxElem*>(TargetAggregateGeom);
-                    BoxElem.Rotation = NewTransform.Rotator();
+                    BoxElem.Rotation = NewGeomTransform.Rotator();
                 }
                 else if (TargetPrimitiveType == EAggCollisionShape::Sphyl)
                 {
                     FKSphylElem& SphylElem = *static_cast<FKSphylElem*>(TargetAggregateGeom);
-                    SphylElem.Rotation = NewTransform.Rotator();
+                    SphylElem.Rotation = NewGeomTransform.Rotator();
                 }
             }
                 break;
