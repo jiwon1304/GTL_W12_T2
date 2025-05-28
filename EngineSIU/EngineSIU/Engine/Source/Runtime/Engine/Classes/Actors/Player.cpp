@@ -725,19 +725,19 @@ bool AEditorPlayer::GetAggregateGeom(UBodySetup*& TargetBodySetup, FKShapeElem*&
     UEditorEngine* Engine = Cast<UEditorEngine>(GEngine);
     if (!Engine)
     {
-        return nullptr;
+        return false;
     }
     AEditorPlayer* EditorPlayer = Engine->GetEditorPlayer();
     if (!EditorPlayer)
     {
-        return nullptr;
+        return false;
     }
 
     USkeletalMeshComponent* SkeletalMeshComp = Engine->PhysicsAssetEditorWorld->GetSkeletalMeshComponent();
 
     if (SkeletalMeshComp == nullptr)
     {
-        return nullptr;
+        return false;
     }
 
     int BodySetupIndex = Engine->PhysicsAssetEditorWorld->SelectedBodySetupIndex;
@@ -748,7 +748,7 @@ bool AEditorPlayer::GetAggregateGeom(UBodySetup*& TargetBodySetup, FKShapeElem*&
 
     if (BodySetupIndex == -1 && (PrimitiveIndex == -1 || ParentBodySetupIndex == -1 || PrimitiveType == EAggCollisionShape::Unknown))
     {
-        return nullptr;
+        return false;
     }
 
     USkeletalMesh* SkeletalMesh = Engine->PhysicsAssetEditorWorld->GetSkeletalMeshComponent()->GetSkeletalMeshAsset();
@@ -765,7 +765,7 @@ bool AEditorPlayer::GetAggregateGeom(UBodySetup*& TargetBodySetup, FKShapeElem*&
 
     if (TargetBodySetup == nullptr || (TargetBodySetup->AggGeom.BoxElems.Num() == 0 && TargetBodySetup->AggGeom.SphereElems.Num() == 0 && TargetBodySetup->AggGeom.SphylElems.Num() == 0))
     {
-        return nullptr;
+        return false;
     }
     
     if (PrimitiveType != EAggCollisionShape::Unknown && PrimitiveIndex != -1)
@@ -805,10 +805,10 @@ bool AEditorPlayer::GetAggregateGeom(UBodySetup*& TargetBodySetup, FKShapeElem*&
 
     if (TargetAggregateGeom == nullptr && TargetPrimitiveType == EAggCollisionShape::Unknown)
     {
-        return nullptr;
+        return false;
     }
 
-    return TargetAggregateGeom;
+    return true;
 }
 
 UObject* APlayer::Duplicate(UObject* InOuter)
